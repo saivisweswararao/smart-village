@@ -43,6 +43,7 @@ grant select,update on public.issues to authenticated;
 grant select,insert on public.issue_updates to authenticated;
 grant select,insert on public.community_suggestions to authenticated;
 
+create policy "Admins can read own profile" on public.admin_profiles for select to authenticated using(user_id=(select auth.uid()));
 create policy "Active villages public" on public.villages for select to anon,authenticated using(is_active);
 create policy "Admins manage villages" on public.villages for all to authenticated using((select private.is_admin())) with check((select private.is_admin()));
 create policy "Published announcements public" on public.announcements for select to anon,authenticated using(status='published' or (select private.is_admin()));
