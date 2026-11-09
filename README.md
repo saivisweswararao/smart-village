@@ -7,6 +7,7 @@ Mobile-first Telugu + English community information website. Static HTML/CSS/JS 
 - Announcements, schemes, local services, development updates
 - Private issue submission and token-protected tracking
 - Starter admin sign-in page
+- Private admin-only voter management with name search, ward filters and voter cards; voter records and photographs stay in private Supabase storage
 - Supabase schema with row-level security (RLS) and RPCs
 
 ## Setup (₹0 target)
