@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex,nofollow,noarchive">
 <title>Private voter management | Penubaka</title>
 <link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script src="js/config.js"></script>
 <script defer src="js/voters.js"></script>
 <style>
 .voter-toolbar{display:grid;grid-template-columns:2fr 1fr auto;gap:10px;align-items:end;margin:18px 0}
@@ -31,7 +31,7 @@ table{width:100%;border-collapse:collapse;min-width:720px}th,td{text-align:left;
 <div class="stat"><span class="muted">Female</span><strong id="female">—</strong></div>
 <div class="stat"><span class="muted">Wards</span><strong id="wards">—</strong></div>
 </section>
-<section class="panel" style="max-width:none">
+<section class="panel" style="max-width:none;margin-top:18px"><h2>Secure source import</h2><p class="muted">Authorized administrators only. Select the private JSON and photo ZIP generated from the 2026 Penubaka PDF. Photographs upload to the private bucket before record details are imported. Never share these files or upload them to GitHub.</p><div class="voter-toolbar" style="grid-template-columns:1fr"><div class="field"><label for="voter-json">Voter records JSON</label><input id="voter-json" type="file" accept=".json,application/json"></div><div class="field"><label for="voter-photos">Private photographs ZIP</label><input id="voter-photos" type="file" accept=".zip,application/zip"></div><button id="import-voters" class="button" type="button">Upload photos and import records</button></div><p id="import-progress" class="status-message" role="status" aria-live="polite"></p></section><section class="panel" style="max-width:none">
 <h2>Search voters</h2>
 <div class="voter-toolbar">
 <div class="field"><label for="q">Name, guardian or house number</label><input id="q" type="search" maxlength="100" placeholder="Search records"></div>
