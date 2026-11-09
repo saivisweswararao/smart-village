@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', async () => {
  if(!client){fail('Supabase is not configured.');return;}
  const {data:{session}}=await client.auth.getSession();
  if(!session){location.replace('admin.html');return;}
- const {data:profile,error:profileError}=await client.from('admin_profiles').select('role').eq('user_id',session.user.id).maybeSingle();
- if(profileError||profile?.role!=='admin'){await client.auth.signOut();location.replace('admin.html');return;}
+ const {data:isAdmin,error:accessError}=await client.rpc('admin_check_access');
+ if(accessError||isAdmin!==true){await client.auth.signOut();location.replace('admin.html');return;}
 
  const importButton=$('import-voters');
  importButton.addEventListener('click',async()=>{
