@@ -12,7 +12,7 @@
 .voter-toolbar input,.voter-toolbar select{width:100%;padding:12px;border:1px solid #cbd8ce;border-radius:10px;font:inherit}
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
 .stat{padding:16px;border:1px solid #e0e8e1;border-radius:14px;background:#fff}.stat strong{display:block;font-size:1.5rem;color:#176b4d}
-.voter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:16px}.voter-card{border:1px solid #dfe9e1;border-radius:16px;background:#fff;padding:16px;box-shadow:0 3px 12px rgba(20,60,35,.05)}.voter-card h3{margin:0 0 8px;font-size:1.05rem;color:#174d38;overflow-wrap:anywhere}.voter-card .voter-meta{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}.voter-chip{background:#edf5ef;color:#24563d;border-radius:30px;padding:5px 9px;font-size:.78rem}.voter-details{display:grid;grid-template-columns:1fr 1fr;gap:10px}.voter-detail small{display:block;color:#68786e;font-size:.75rem;margin-bottom:3px}.voter-detail strong{font-size:.9rem;overflow-wrap:anywhere}.empty-state{grid-column:1/-1;padding:24px;text-align:center;color:#66756b;border:1px dashed #cbd8ce;border-radius:14px}
+.voter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:16px}.voter-card{border:1px solid #dfe9e1;border-radius:16px;background:#fff;padding:16px;box-shadow:0 3px 12px rgba(20,60,35,.05)}.voter-photo{width:104px;height:124px;object-fit:cover;border-radius:10px;border:1px solid #dfe9e1;display:block;margin:0 0 10px}.voter-id{font-size:.84rem;font-weight:700;color:#315b43;margin:-2px 0 10px;overflow-wrap:anywhere}.voter-card h3{margin:0 0 8px;font-size:1.05rem;color:#174d38;overflow-wrap:anywhere}.voter-card .voter-meta{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}.voter-chip{background:#edf5ef;color:#24563d;border-radius:30px;padding:5px 9px;font-size:.78rem}.voter-details{display:grid;grid-template-columns:1fr 1fr;gap:10px}.voter-detail small{display:block;color:#68786e;font-size:.75rem;margin-bottom:3px}.voter-detail strong{font-size:.9rem;overflow-wrap:anywhere}.empty-state{grid-column:1/-1;padding:24px;text-align:center;color:#66756b;border:1px dashed #cbd8ce;border-radius:14px}
 table{width:100%;border-collapse:collapse;min-width:720px}th,td{text-align:left;padding:11px 13px;border-bottom:1px solid #e8eee9;font-size:.92rem}th{background:#edf4ed;color:#234235;position:sticky;top:0}
 .notice{padding:13px 15px;background:#fff8e8;border:1px solid #eed9a5;border-radius:12px;line-height:1.55}
 @media(max-width:650px){.voter-toolbar{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -23,7 +23,7 @@ table{width:100%;border-collapse:collapse;min-width:720px}th,td{text-align:left;
 <main class="page-wrap">
 <a class="nav-back" href="admin.html">← Admin</a>
 <h1>Voter records · Penubaka</h1>
-<p class="muted">Restricted admin access. Search results intentionally hide voter ID numbers and photographs. Do not export, share, or use this information for political targeting.</p>
+<p class="muted">Restricted admin access. Search is restricted to authenticated administrators and displays voter numbers and private photographs. Do not export, share, or use this information for political targeting.</p>
 <div class="notice">This is a private records tool, not an official Election Commission service. Use only for a lawful, authorized administrative purpose. Keep accounts limited to approved administrators.</div>
 <section id="stats" class="stats" aria-live="polite">
 <div class="stat"><span class="muted">Total records</span><strong id="total">—</strong></div>
@@ -34,7 +34,7 @@ table{width:100%;border-collapse:collapse;min-width:720px}th,td{text-align:left;
 <section class="panel" style="max-width:none;margin-top:18px"><h2>Secure source import</h2><p class="muted">Authorized administrators only. Select the private JSON and photo ZIP generated from the 2026 Penubaka PDF. Photographs upload to the private bucket before record details are imported. Never share these files or upload them to GitHub.</p><div class="voter-toolbar" style="grid-template-columns:1fr"><div class="field"><label for="voter-json">Voter records JSON</label><input id="voter-json" type="file" accept=".json,application/json"></div><div class="field"><label for="voter-photos">Private photographs ZIP</label><input id="voter-photos" type="file" accept=".zip,application/zip"></div><button id="import-voters" class="button" type="button">Upload photos and import records</button></div><p id="import-progress" class="status-message" role="status" aria-live="polite"></p></section><section class="panel" style="max-width:none">
 <h2>Search voters</h2>
 <div class="voter-toolbar">
-<div class="field"><label for="q">Search by voter name</label><input id="q" type="search" maxlength="100" placeholder="Enter voter name"></div>
+<div class="field"><label for="q">Search by voter name</label><input id="q" type="search" maxlength="100" placeholder="Enter voter name or voter number"></div>
 <div class="field"><label for="ward">Ward</label><select id="ward"><option value="">All wards</option><option value="1">Ward 1</option><option value="2">Ward 2</option><option value="3">Ward 3</option><option value="4">Ward 4</option><option value="5">Ward 5</option><option value="6">Ward 6</option><option value="7">Ward 7</option><option value="8">Ward 8</option><option value="9">Ward 9</option><option value="10">Ward 10</option><option value="11">Ward 11</option><option value="12">Ward 12</option></select></div>
 <button id="search" class="button" type="button">Search</button>
 </div>
@@ -42,5 +42,5 @@ table{width:100%;border-collapse:collapse;min-width:720px}th,td{text-align:left;
 <div id="voter-cards" class="voter-grid" aria-live="polite"><div class="empty-state">Sign-in check in progress…</div></div><div style="display:flex;justify-content:center;margin-top:16px"><button id="load-more" class="button button-secondary" type="button" hidden>Load more voters</button></div><p class="muted" id="count"></p>
 </section>
 </main>
-<footer class="site-footer"><span>Private admin access · Penubaka</span><span>Voter IDs and photos are not displayed here.</span></footer>
+<footer class="site-footer"><span>Private admin access · Penubaka</span><span>Private administrator access only.</span></footer>
 </body></html>
