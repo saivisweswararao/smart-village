@@ -56,8 +56,7 @@ begin
       and (p_ward is null or v.ward_no = p_ward)
       and (nullif(trim(p_query),'') is null
         or v.voter_name ilike '%' || trim(p_query) || '%'
-        or coalesce(v.guardian_name,'') ilike '%' || trim(p_query) || '%'
-        or coalesce(v.house_no,'') ilike '%' || trim(p_query) || '%')
+        )
     order by v.ward_no, v.serial_no
     limit least(greatest(coalesce(p_limit,50),1),100)
     offset greatest(coalesce(p_offset,0),0);
