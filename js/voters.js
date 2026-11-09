@@ -19,10 +19,24 @@ document.addEventListener('DOMContentLoaded', async () => {
    const rawText=new TextDecoder('utf-8',{fatal:true}).decode(await jsonFile.arrayBuffer()).replace(/^\\uFEFF/,'');
    const records=JSON.parse(rawText);
    if(!Array.isArray(records)||records.length===0||records.length>5000)throw new Error('The JSON must contain a non-empty array of no more than 5,000 voter records.');
-   // PostgreSQL jsonb/text cannot store U+0000. Remove null characters from OCR text fields.
-   const textFields=['voter_name','guardian_name','relationship','house_no','voter_id','photo_path'];
+   // PostgreSQL JSONB rejects U+0000 and unpaired UTF-16 surrogates.
+   // Clean every string in each record, not just the known voter columns.
    let cleanedCharacters=0;
-   for(const record of records){for(const field of textFields){if(typeof record[field]==='string'){const cleaned=record[field].replace(/\\u0000/g,'').trim();if(cleaned!==record[field])cleanedCharacters++;record[field]=cleaned||null;}}}
+   function cleanUnicode(value){
+    if(typeof value==='string'){
+     let out='';
+     for(const ch of value){
+      const cp=ch.codePointAt(0);
+      if(cp===0||(cp>=0xD800&&cp<=0xDFFF)){cleanedCharacters++;continue;}
+      out+=ch;
+     }
+     return out.normalize('NFC').trim();
+    }
+    if(Array.isArray(value))return value.map(cleanUnicode);
+    if(value&&typeof value==='object'){for(const key of Object.keys(value))value[key]=cleanUnicode(value[key]);}
+    return value;
+   }
+   records.forEach(cleanUnicode);
    const invalid=records.findIndex(r=>!Number.isInteger(Number(r.ward_no))||!Number.isInteger(Number(r.serial_no))||Number(r.ward_no)<1||Number(r.ward_no)>12||Number(r.serial_no)<1||!r.voter_name);
    if(invalid>=0)throw new Error('Invalid required voter data at JSON record '+(invalid+1)+'. Check ward, serial number and voter name.');
    const zip=await JSZip.loadAsync(zipFile);
@@ -37,7 +51,19 @@ document.addEventListener('DOMContentLoaded', async () => {
    if(failures.length)throw new Error(failures.length+' photos failed. Record import stopped; retry with the same files.');
    progress.textContent='Photos uploaded. Importing '+records.length+' voter details…'+(cleanedCharacters?' Cleaned unsupported null characters in '+cleanedCharacters+' text fields.':'');
    let imported=0;
-   for(let i=0;i<records.length;i+=200){const {data,error}=await client.rpc('admin_import_voters',{p_rows:records.slice(i,i+200)});if(error)throw error;imported+=Number(data||0);progress.textContent='Record import: '+Math.min(i+200,records.length)+' / '+records.length;}
+   // Small batches reduce request size. If a batch fails, isolate the exact row.
+   async function importBatch(rows,baseIndex){
+    const {data,error}=await client.rpc('admin_import_voters',{p_rows:rows});
+    if(!error){imported+=Number(data||0);return;}
+    if(rows.length===1)throw new Error('Database rejected JSON record '+(baseIndex+1)+': '+error.message);
+    const mid=Math.floor(rows.length/2);
+    await importBatch(rows.slice(0,mid),baseIndex);
+    await importBatch(rows.slice(mid),baseIndex+mid);
+   }
+   for(let i=0;i<records.length;i+=50){
+    await importBatch(records.slice(i,i+50),i);
+    progress.textContent='Record import: '+Math.min(i+50,records.length)+' / '+records.length+' · imported '+imported;
+   }
    progress.textContent='Completed: '+entries.length+' private photos uploaded; '+imported+' voter records imported.';
    $('voter-json').value='';$('voter-photos').value='';await load();
    const {data:stats}=await client.rpc('admin_voter_stats');if(stats?.length){const s=stats[0];$('total').textContent=s.total_voters;$('male').textContent=s.male_voters;$('female').textContent=s.female_voters;$('wards').textContent=s.wards_count;}
