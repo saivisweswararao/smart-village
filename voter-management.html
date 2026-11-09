@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Private voter management | Penubaka</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js"></script>
+<script defer src="js/voters.js"></script>
+<style>
+.voter-toolbar{display:grid;grid-template-columns:2fr 1fr auto;gap:10px;align-items:end;margin:18px 0}
+.voter-toolbar input,.voter-toolbar select{width:100%;padding:12px;border:1px solid #cbd8ce;border-radius:10px;font:inherit}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
+.stat{padding:16px;border:1px solid #e0e8e1;border-radius:14px;background:#fff}.stat strong{display:block;font-size:1.5rem;color:#176b4d}
+.table-wrap{overflow:auto;border:1px solid #e0e8e1;border-radius:14px;background:#fff}
+table{width:100%;border-collapse:collapse;min-width:720px}th,td{text-align:left;padding:11px 13px;border-bottom:1px solid #e8eee9;font-size:.92rem}th{background:#edf4ed;color:#234235;position:sticky;top:0}
+.notice{padding:13px 15px;background:#fff8e8;border:1px solid #eed9a5;border-radius:12px;line-height:1.55}
+@media(max-width:650px){.voter-toolbar{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header class="site-header"><a class="brand" href="index.html"><span class="brand-icon">గ్రా</span><span><strong>Penubaka Voter Management</strong><small>Private administrator area</small></span></a><button id="sign-out" class="button button-secondary" type="button">Sign out</button></header>
+<main class="page-wrap">
+<a class="nav-back" href="admin.html">← Admin</a>
+<h1>Voter records · Penubaka</h1>
+<p class="muted">Restricted admin access. Search results intentionally hide voter ID numbers and photographs. Do not export, share, or use this information for political targeting.</p>
+<div class="notice">This is a private records tool, not an official Election Commission service. Use only for a lawful, authorized administrative purpose. Keep accounts limited to approved administrators.</div>
+<section id="stats" class="stats" aria-live="polite">
+<div class="stat"><span class="muted">Total records</span><strong id="total">—</strong></div>
+<div class="stat"><span class="muted">Male</span><strong id="male">—</strong></div>
+<div class="stat"><span class="muted">Female</span><strong id="female">—</strong></div>
+<div class="stat"><span class="muted">Wards</span><strong id="wards">—</strong></div>
+</section>
+<section class="panel" style="max-width:none">
+<h2>Search voters</h2>
+<div class="voter-toolbar">
+<div class="field"><label for="q">Name, guardian or house number</label><input id="q" type="search" maxlength="100" placeholder="Search records"></div>
+<div class="field"><label for="ward">Ward</label><select id="ward"><option value="">All wards</option><option value="1">Ward 1</option><option value="2">Ward 2</option><option value="3">Ward 3</option><option value="4">Ward 4</option><option value="5">Ward 5</option><option value="6">Ward 6</option><option value="7">Ward 7</option><option value="8">Ward 8</option><option value="9">Ward 9</option><option value="10">Ward 10</option><option value="11">Ward 11</option><option value="12">Ward 12</option></select></div>
+<button id="search" class="button" type="button">Search</button>
+</div>
+<p id="message" class="status-message" role="status"></p>
+<div class="table-wrap"><table><thead><tr><th>Ward</th><th>Serial</th><th>Voter name</th><th>Guardian / relation</th><th>Age</th><th>Gender</th><th>House no.</th></tr></thead><tbody id="rows"><tr><td colspan="7">Sign-in check in progress…</td></tr></tbody></table></div>
+<p class="muted" id="count"></p>
+</section>
+</main>
+<footer class="site-footer"><span>Private admin access · Penubaka</span><span>Voter IDs and photos are not displayed here.</span></footer>
+</body></html>
