@@ -2,30 +2,25 @@
 <html lang="te">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Submit and view public village grievances for Penubaka.">
-<title>Village Grievances | Penubaka</title>
+<meta name="description" content="Submit a complaint about a village issue in Penubaka.">
+<title>Report a Complaint | Penubaka</title>
 <link rel="stylesheet" href="css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script><script defer src="js/language.js"></script><script defer src="js/grievances.js"></script>
-<style>
-.grievance-layout{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:22px;align-items:start}.grievance-layout .panel{max-width:none;margin-top:16px}.grievance-list{display:grid;gap:14px;margin-top:16px}.grievance-card{padding:17px;border:1px solid #e0e8e1;border-radius:15px;background:#fff;overflow-wrap:anywhere}.grievance-card p{white-space:pre-wrap;line-height:1.6;margin:10px 0}.grievance-meta{font-size:.84rem;color:#65766c;display:flex;gap:12px;flex-wrap:wrap}.grievance-photo{display:block;max-width:100%;max-height:260px;object-fit:contain;border-radius:10px;margin-top:12px}.grievance-heading{display:flex;justify-content:space-between;gap:12px;align-items:center}.grievance-count{font-size:.9rem;color:#65766c}@media(max-width:760px){.grievance-layout{grid-template-columns:1fr}}
-</style>
 </head>
 <body>
 <header class="site-header"><a class="brand" href="index.html"><span class="brand-icon">గ్రా</span><span><strong>మన పెనుబాక</strong><small>Penubaka Smart Village</small></span></a><button id="language-toggle" class="language-toggle" type="button">English</button></header>
 <main class="page-wrap">
 <a class="nav-back" href="index.html">← Home / హోమ్</a><span class="eyebrow">COMMUNITY VOICE · ప్రజల గొంతుక</span>
-<h1 data-en="Village Grievances" data-te="గ్రామ సమస్యలు & ఫిర్యాదులు">గ్రామ సమస్యలు & ఫిర్యాదులు</h1>
-<p class="muted" data-en="Share a village issue and view reports submitted by the community. Reports on this page are public." data-te="గ్రామ సమస్యను తెలియజేయండి. గ్రామ ప్రజలు నమోదు చేసిన ఫిర్యాదులను ఇక్కడ అందరూ చూడవచ్చు.">గ్రామ సమస్యను తెలియజేయండి. గ్రామ ప్రజలు నమోదు చేసిన ఫిర్యాదులను ఇక్కడ అందరూ చూడవచ్చు.</p>
-<div class="grievance-layout"><section><h2 data-en="Submit a grievance" data-te="ఫిర్యాదు నమోదు చేయండి">ఫిర్యాదు నమోదు చేయండి</h2>
+<h1 data-en="Report a complaint" data-te="ఫిర్యాదు నమోదు చేయండి">ఫిర్యాదు నమోదు చేయండి</h1>
+<p class="muted" data-en="Use this form to report a village issue such as roads, drinking water, streetlights, sanitation or drainage." data-te="రోడ్లు, తాగునీరు, వీధి దీపాలు, పారిశుధ్యం లేదా డ్రైనేజీ వంటి గ్రామ సమస్యలను ఈ ఫారమ్ ద్వారా తెలియజేయండి.">రోడ్లు, తాగునీరు, వీధి దీపాలు, పారిశుధ్యం లేదా డ్రైనేజీ వంటి గ్రామ సమస్యలను ఈ ఫారమ్ ద్వారా తెలియజేయండి.</p>
 <form id="grievance-form" class="panel">
 <div class="field"><label for="grievance-name" data-en="Your name (optional)" data-te="మీ పేరు (ఐచ్ఛికం)">మీ పేరు (ఐచ్ఛికం)</label><input id="grievance-name" name="name" maxlength="80" autocomplete="name" placeholder="Name / పేరు"></div>
-<div class="field"><label for="grievance-description" data-en="Complaint description (required)" data-te="ఫిర్యాదు వివరాలు (తప్పనిసరి)">ఫిర్యాదు వివరాలు (తప్పనిసరి)</label><textarea id="grievance-description" name="description" required minlength="5" maxlength="3000" rows="6" placeholder="Describe the issue clearly / సమస్యను వివరించండి"></textarea><small class="muted">5–3,000 characters</small></div>
+<div class="field"><label for="grievance-description" data-en="Complaint description (required)" data-te="ఫిర్యాదు వివరాలు (తప్పనిసరి)">ఫిర్యాదు వివరాలు (తప్పనిసరి)</label><textarea id="grievance-description" name="description" required minlength="5" maxlength="3000" rows="7" placeholder="Describe the issue clearly / సమస్యను వివరించండి"></textarea><small class="muted">5–3,000 characters</small></div>
 <div class="field"><label for="grievance-photo" data-en="Photo (optional)" data-te="ఫోటో (ఐచ్ఛికం)">ఫోటో (ఐచ్ఛికం)</label><input id="grievance-photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp"><small class="muted" data-en="JPG, PNG or WebP · maximum 5 MB" data-te="JPG, PNG లేదా WebP · గరిష్ఠంగా 5 MB">JPG, PNG లేదా WebP · గరిష్ఠంగా 5 MB</small></div>
-<p class="muted" data-en="This is a public page. Do not include phone numbers, addresses, voter details or other sensitive personal information. Submitted complaints and photos can be viewed by anyone." data-te="ఈ పేజీలో ఫిర్యాదులు అందరికీ కనిపిస్తాయి. ఫోన్ నంబర్లు, చిరునామాలు, ఓటర్ వివరాలు లేదా వ్యక్తిగత రహస్య సమాచారాన్ని నమోదు చేయవద్దు.">ఈ పేజీలో ఫిర్యాదులు అందరికీ కనిపిస్తాయి. ఫోన్ నంబర్లు, చిరునామాలు, ఓటర్ వివరాలు లేదా వ్యక్తిగత రహస్య సమాచారాన్ని నమోదు చేయవద్దు.</p>
-<button class="button" id="grievance-submit" type="submit" data-en="Submit grievance" data-te="ఫిర్యాదు పంపండి">ఫిర్యాదు పంపండి</button><p id="grievance-message" class="status-message" role="status" aria-live="polite"></p>
-</form></section>
-<section><div class="grievance-heading"><h2 data-en="Community reports" data-te="ప్రజల ఫిర్యాదులు">ప్రజల ఫిర్యాదులు</h2><span id="grievance-count" class="grievance-count"></span></div><p class="muted" data-en="Latest public submissions" data-te="ఇటీవల నమోదైన ఫిర్యాదులు">ఇటీవల నమోదైన ఫిర్యాదులు</p><div id="grievance-list" class="grievance-list" aria-live="polite"><div class="panel">Loading reports…</div></div></section></div>
+<p class="muted" data-en="Do not include phone numbers, addresses, voter details or other sensitive personal information. Your complaint will be visible publicly only after admin review and publication." data-te="ఫోన్ నంబర్లు, చిరునామాలు, ఓటర్ వివరాలు లేదా ఇతర వ్యక్తిగత రహస్య సమాచారాన్ని నమోదు చేయవద్దు. నిర్వాహకుల పరిశీలన, ఆమోదం తర్వాతే మీ ఫిర్యాదు అందరికీ కనిపిస్తుంది.">ఫోన్ నంబర్లు, చిరునామాలు, ఓటర్ వివరాలు లేదా ఇతర వ్యక్తిగత రహస్య సమాచారాన్ని నమోదు చేయవద్దు. నిర్వాహకుల పరిశీలన, ఆమోదం తర్వాతే మీ ఫిర్యాదు అందరికీ కనిపిస్తుంది.</p>
+<button class="button" id="grievance-submit" type="submit" data-en="Submit complaint" data-te="ఫిర్యాదు పంపండి">ఫిర్యాదు పంపండి</button><p id="grievance-message" class="status-message" role="status" aria-live="polite"></p>
+</form>
 </main><footer class="site-footer"><span>© <span id="year"></span> Penubaka Smart Village</span><span>Community information · తెలుగు + English</span></footer>
 <script defer src="js/visitor-counter.js"></script>
 </body></html>
