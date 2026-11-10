@@ -7,10 +7,11 @@
 .admin-grievance-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
 .admin-grievance-actions select{padding:10px;border:1px solid #cbd8ce;border-radius:9px;font:inherit}
 .danger-button{border:0;border-radius:10px;padding:10px 14px;background:#a52a2a;color:white;font:inherit;font-weight:700;cursor:pointer}
+.publish-grievance{background:#176b4d!important;color:white!important}
 .admin-photo{max-width:100%;max-height:230px;border-radius:10px;margin-top:8px}
 </style></head>
 <body><header class="site-header"><a class="brand" href="index.html"><span class="brand-icon">గ్రా</span><span><strong>Penubaka Admin</strong><small>Grievance moderation</small></span></a></header>
-<main class="page-wrap"><a class="nav-back" href="admin.html">← Admin tools</a><h1>Manage public grievances</h1><p class="muted">Only authorized administrators can change complaint status or delete abusive, vulgar, spam or inappropriate reports. Deletion is permanent.</p>
+<main class="page-wrap"><a class="nav-back" href="admin.html">← Admin tools</a><h1>Review and publish grievances</h1><p class="muted">New complaints are private until an authorized administrator publishes them. Review the text and photo before publishing. You can keep a complaint under review, mark it resolved or rejected, or permanently delete vulgar, abusive or spam content.</p>
 <div id="admin-grievance-message" class="status-message" role="status" aria-live="polite"></div>
 <div class="admin-toolbar"><strong id="admin-grievance-count">Loading…</strong><button id="refresh-grievances" class="button button-secondary" type="button">Refresh list</button></div>
 <div id="admin-grievance-list" class="admin-grievance-list"></div></main>
