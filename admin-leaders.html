@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Manage village leaders | Penubaka Admin</title><link rel="stylesheet" href="css/style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js"></script><script defer src="js/admin-leaders.js"></script>
+<style>
+.leader-admin-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:18px}
+.leader-admin-card{background:#fff;border:1px solid #dfe8e1;border-radius:15px;padding:16px}
+.leader-admin-photo{width:100%;height:190px;object-fit:cover;border-radius:11px;background:#edf4ed}
+.leader-admin-card h3{margin:10px 0 4px}.leader-admin-card p{margin:0;color:#65766c}
+.leader-admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.leader-admin-actions button{font:inherit;border:0;border-radius:9px;padding:9px 12px;cursor:pointer}
+.leader-edit{background:#e9f1eb;color:#176b4d;font-weight:700}.leader-delete{background:#a52a2a;color:#fff;font-weight:700}
+#leader-photo-preview{max-width:180px;max-height:180px;object-fit:cover;border-radius:12px;display:none;margin-top:8px}
+</style></head>
+<body><header class="site-header"><a class="brand" href="index.html"><span class="brand-icon">గ్రా</span><span><strong>Penubaka Admin</strong><small>Village leaders</small></span></a></header>
+<main class="page-wrap"><a class="nav-back" href="admin.html">← Admin tools</a><h1>Manage village leaders</h1><p class="muted">Add a leader's photograph, name and designation. Saved leaders will appear publicly on the village website.</p>
+<div id="leader-admin-message" class="status-message" role="status" aria-live="polite"></div>
+<form id="leader-form" class="panel">
+<h2 id="leader-form-title">Add a village leader</h2>
+<div class="field"><label for="leader-name">Name</label><input id="leader-name" maxlength="100" required placeholder="Enter leader name"></div>
+<div class="field"><label for="leader-designation">Designation / Post</label><input id="leader-designation" maxlength="120" required placeholder="e.g. Sarpanch, Ward Member"></div>
+<div class="field"><label for="leader-photo">Photo (JPG, PNG or WebP; max 5 MB)</label><input id="leader-photo" type="file" accept="image/jpeg,image/png,image/webp"><img id="leader-photo-preview" alt="Selected leader photo"></div>
+<button id="leader-save" class="button" type="submit">Save leader</button>
+<button id="leader-cancel" class="button button-secondary" type="button" hidden>Cancel edit</button>
+</form>
+<section><div class="admin-toolbar"><h2>Published leaders</h2><button id="refresh-leaders" class="button button-secondary" type="button">Refresh</button></div><div id="leader-admin-list" class="leader-admin-list">Loading leaders…</div></section>
+</main><footer class="site-footer">Penubaka Smart Village · Admin only</footer></body></html>
