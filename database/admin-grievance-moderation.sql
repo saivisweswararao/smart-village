@@ -3,8 +3,9 @@
 -- so none are exposed publicly without an explicit admin approval.
 alter table public.public_grievances
   add column if not exists status text not null default 'Pending Review';
-update public.public_grievances set status='Pending Review';
 alter table public.public_grievances drop constraint if exists public_grievances_status_check;
+alter table public.public_grievances alter column status set default 'Pending Review';
+update public.public_grievances set status='Pending Review';
 alter table public.public_grievances add constraint public_grievances_status_check
   check (status in ('Pending Review','Published','Under Review','In Progress','Resolved','Rejected'));
 
