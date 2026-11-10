@@ -14,13 +14,9 @@
     return;
   }
 
-  const storageKey = "penubaka_visitor_counted_v1";
-  const isFirstVisit = !localStorage.getItem(storageKey);
-  const rpcName = isFirstVisit ? "increment_site_visitors" : "get_site_visitor_count";
-
-  client.rpc(rpcName).then(({ data, error }) => {
+  // Count every page load, including repeat visits from the same browser.
+  client.rpc("increment_site_visitors").then(({ data, error }) => {
     if (error) throw error;
-    if (isFirstVisit) localStorage.setItem(storageKey, "1");
     output.textContent = Number(data || 0).toLocaleString("en-IN");
   }).catch((error) => {
     console.error("Visitor counter:", error.message);
