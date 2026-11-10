@@ -9,17 +9,25 @@
 .leader-admin-actions button{font:inherit;border:0;border-radius:9px;padding:9px 12px;cursor:pointer}
 .leader-edit{background:#e9f1eb;color:#176b4d;font-weight:700}.leader-delete{background:#a52a2a;color:#fff;font-weight:700}
 #leader-photo-preview{max-width:180px;max-height:180px;object-fit:cover;border-radius:12px;display:none;margin-top:8px}
+.leader-setting-row{display:flex;gap:16px;flex-wrap:wrap;align-items:center}.leader-setting-row .field{flex:1;min-width:180px}
+.leader-visibility{display:flex;gap:9px;align-items:center;margin:12px 0 18px}
+.leader-state{display:inline-block;padding:4px 8px;border-radius:20px;font-size:12px;background:#e5f4e9;color:#176b4d;margin-top:8px}
+.leader-state.hidden{background:#fff0e8;color:#a34a1d}
 </style></head>
 <body><header class="site-header"><a class="brand" href="index.html"><span class="brand-icon">గ్రా</span><span><strong>Penubaka Admin</strong><small>Village leaders</small></span></a></header>
-<main class="page-wrap"><a class="nav-back" href="admin.html">← Admin tools</a><h1>Manage village leaders</h1><p class="muted">Add a leader's photograph, name and designation. Saved leaders will appear publicly on the village website.</p>
+<main class="page-wrap"><a class="nav-back" href="admin.html">← Admin tools</a><h1>Manage village leaders</h1><p class="muted">Set display priority and choose which leaders appear on the public village website. Higher priority numbers appear first.</p>
 <div id="leader-admin-message" class="status-message" role="status" aria-live="polite"></div>
 <form id="leader-form" class="panel">
 <h2 id="leader-form-title">Add a village leader</h2>
 <div class="field"><label for="leader-name">Name</label><input id="leader-name" maxlength="100" required placeholder="Enter leader name"></div>
 <div class="field"><label for="leader-designation">Designation / Post</label><input id="leader-designation" maxlength="120" required placeholder="e.g. Sarpanch, Ward Member"></div>
+<div class="leader-setting-row">
+<div class="field"><label for="leader-priority">Display priority</label><input id="leader-priority" type="number" min="0" max="9999" step="1" value="0" required><small>Higher number = displayed earlier. Use the same number for equal priority.</small></div>
+</div>
+<label class="leader-visibility"><input id="leader-visible" type="checkbox" checked> Show this leader on the public website</label>
 <div class="field"><label for="leader-photo">Photo (JPG, PNG or WebP; max 5 MB)</label><input id="leader-photo" type="file" accept="image/jpeg,image/png,image/webp"><img id="leader-photo-preview" alt="Selected leader photo"></div>
 <button id="leader-save" class="button" type="submit">Save leader</button>
 <button id="leader-cancel" class="button button-secondary" type="button" hidden>Cancel edit</button>
 </form>
-<section><div class="admin-toolbar"><h2>Published leaders</h2><button id="refresh-leaders" class="button button-secondary" type="button">Refresh</button></div><div id="leader-admin-list" class="leader-admin-list">Loading leaders…</div></section>
+<section><div class="admin-toolbar"><h2>Leader display settings</h2><button id="refresh-leaders" class="button button-secondary" type="button">Refresh</button></div><p class="muted">Edit a leader to change priority or public visibility. Hidden leaders remain saved in the admin list.</p><div id="leader-admin-list" class="leader-admin-list">Loading leaders…</div></section>
 </main><footer class="site-footer">Penubaka Smart Village · Admin only</footer></body></html>
