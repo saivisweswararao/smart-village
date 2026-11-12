@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script><script defer src="js/language.js"></script><script defer src="js/complaints.js"></script>
 <style>
-.complaints-list{display:grid;gap:14px;margin-top:18px}.complaint-card{padding:18px;border:1px solid #e0e8e1;border-radius:15px;background:#fff;overflow-wrap:anywhere}.complaint-card p{white-space:pre-wrap;line-height:1.65;margin:10px 0}.complaint-meta{font-size:.86rem;color:#65766c;display:flex;gap:12px;flex-wrap:wrap}.complaint-photo{display:block;max-width:100%;max-height:300px;object-fit:contain;border-radius:10px;margin-top:12px}.complaints-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.complaints-list{display:grid;gap:14px;margin-top:18px}.complaint-card{padding:18px;border:1px solid #e0e8e1;border-radius:15px;background:#fff;overflow-wrap:anywhere}.complaint-card p{white-space:pre-wrap;line-height:1.65;margin:10px 0}.complaint-meta{font-size:.86rem;color:#65766c;display:flex;gap:12px;flex-wrap:wrap}.complaint-photo{display:block;max-width:100%;max-height:300px;object-fit:contain;border-radius:10px;margin-top:12px}.complaints-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.complaint-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.complaint-tab{border:1px solid #cbd8ce;border-radius:999px;padding:9px 16px;background:#fff;color:#315344;font:inherit;font-weight:700;cursor:pointer}.complaint-tab.active{background:#176b4d;border-color:#176b4d;color:#fff}.complaint-resolved-tick{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#e2f5e8;color:#16803d;font-size:15px;font-weight:900;margin-left:6px;vertical-align:middle}
 </style>
 </head>
 <body>
@@ -20,6 +20,7 @@
 <h1 data-en="Village Complaints" data-te="గ్రామ ఫిర్యాదులు">గ్రామ ఫిర్యాదులు</h1>
 <p class="muted" data-en="Browse complaints reviewed and published by the administrators. New submissions appear here after approval." data-te="నిర్వాహకులు పరిశీలించి ప్రచురించిన ఫిర్యాదులను ఇక్కడ చూడవచ్చు. కొత్త ఫిర్యాదులు ఆమోదం తర్వాత కనిపిస్తాయి.">నిర్వాహకులు పరిశీలించి ప్రచురించిన ఫిర్యాదులను ఇక్కడ చూడవచ్చు. కొత్త ఫిర్యాదులు ఆమోదం తర్వాత కనిపిస్తాయి.</p>
 <div class="complaints-toolbar"><strong id="complaint-count" class="muted">Loading complaints…</strong><button id="refresh-complaints" class="button button-secondary" type="button">Refresh / మళ్లీ చూడండి</button></div>
+<div class="complaint-tabs" role="tablist" aria-label="Complaint status"><button class="complaint-tab active" type="button" role="tab" aria-selected="true" data-status="Published">Published</button><button class="complaint-tab" type="button" role="tab" aria-selected="false" data-status="In Progress">In Progress</button><button class="complaint-tab" type="button" role="tab" aria-selected="false" data-status="Resolved">Resolved</button></div>
 <div id="complaints-list" class="complaints-list" aria-live="polite"><div class="panel">Loading…</div></div>
 </main>
 <footer class="site-footer"><span>© <span id="year"></span> Penubaka Smart Village</span><span>Community information · తెలుగు + English</span></footer>
