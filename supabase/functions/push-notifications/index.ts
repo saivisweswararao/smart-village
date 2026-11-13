@@ -99,6 +99,8 @@ Deno.serve(async (req: Request) => {
       if (!title || !message) return json({ error: "Notification title and message are required" }, 400);
 
       const vapidKeys = await webpush.importVapidKeys(JSON.parse(VAPID_KEY_PAIR_JSON), { extractable: false });
+      const configuredPublicKey = await webpush.exportApplicationServerKey(vapidKeys);
+      if (configuredPublicKey !== VAPID_PUBLIC_KEY) throw new Error("VAPID public/private key pair does not match");
       const appServer = await webpush.ApplicationServer.new({ contactInformation: "mailto:" + VAPID_CONTACT_EMAIL, vapidKeys });
       const { data: village, error: villageError } = await db
         .from("villages").select("id").eq("slug", "penubaka").single();
