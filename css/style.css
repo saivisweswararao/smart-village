@@ -23,3 +23,7 @@
 .push-notification-modal-card p{color:#52665a;line-height:1.6}
 .push-notification-modal-card button{width:100%;margin-top:10px}
 .push-notification-modal-card .push-modal-note{font-size:12px;margin:14px 0 0}
+
+.announcement-title-en{font-size:1rem;font-weight:650;color:#52665a;margin:0 0 10px}
+.announcement-body-en{color:#52665a}
+.announcement-date{display:block;margin-top:12px}
