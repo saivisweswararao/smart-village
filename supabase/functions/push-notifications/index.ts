@@ -23,9 +23,21 @@ Deno.serve(async (req: Request) => {
     const VAPID_KEY_PAIR_JSON = Deno.env.get("VAPID_KEY_PAIR_JSON")!;
     const VAPID_CONTACT_EMAIL = Deno.env.get("VAPID_CONTACT_EMAIL")!;
 
-    if (!SUPABASE_URL || !SERVICE_ROLE_KEY || !PUBLISHABLE_KEY ||
-        !VAPID_PUBLIC_KEY || !VAPID_KEY_PAIR_JSON || !VAPID_CONTACT_EMAIL) {
-      return json({ error: "Push service is not configured. Contact the site administrator." }, 503);
+    const missingSecrets = [
+      ["SUPABASE_URL", SUPABASE_URL],
+      ["SUPABASE_SERVICE_ROLE_KEY", SERVICE_ROLE_KEY],
+      ["APP_PUBLISHABLE_KEY", PUBLISHABLE_KEY],
+      ["VAPID_PUBLIC_KEY", VAPID_PUBLIC_KEY],
+      ["VAPID_KEY_PAIR_JSON", VAPID_KEY_PAIR_JSON],
+      ["VAPID_CONTACT_EMAIL", VAPID_CONTACT_EMAIL]
+    ].filter(([, value]) => !value).map(([name]) => name);
+
+    if (missingSecrets.length) {
+      console.error("Push configuration missing environment variables:", missingSecrets.join(", "));
+      return json({
+        error: "Push service configuration is incomplete.",
+        missing: missingSecrets
+      }, 503);
     }
 
     if (req.headers.get("apikey") !== PUBLISHABLE_KEY) {
