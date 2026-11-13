@@ -4,3 +4,11 @@
 .village-leaders-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:18px;margin-top:20px}.village-leader-card{overflow:hidden;background:#fff;border:1px solid #e0e9e0;border-radius:17px;padding:14px;text-align:center}.village-leader-card img{display:block;width:100%;height:340px;object-fit:cover;object-position:center;border-radius:12px;background:#edf4ed}@media(max-width:700px){.village-leader-card img{height:320px}}.village-leader-card h3{margin:12px 0 5px}.village-leader-card p{margin:0;color:#65766c;font-weight:600;line-height:1.5}
 
 .about-intro{max-width:1100px;margin:0 auto;padding:20px 22px 4px}.about-intro .hero-tagline{margin:0;max-width:760px;color:#52665a;line-height:1.7}
+
+.notification-interest{background:#edf4ed;border-radius:18px;margin-top:22px;margin-bottom:22px}
+.notification-interest-copy{max-width:760px}
+.notification-interest h2{margin:8px 0}
+.notification-interest p{line-height:1.65;color:#52665a}
+.notification-interest-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.notification-interest-actions button:disabled{opacity:.65;cursor:default}
+.notification-interest .status-message{font-weight:600;color:#176b4d}
