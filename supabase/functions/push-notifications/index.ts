@@ -69,6 +69,16 @@ Deno.serve(async (req: Request) => {
       return json({ success: true, message: "This device is subscribed." });
     }
 
+    if (body.action === "unsubscribe") {
+      const endpoint = body.endpoint;
+      if (typeof endpoint !== "string" || !endpoint.startsWith("https://")) {
+        return json({ error: "Invalid subscription endpoint" }, 400);
+      }
+      const { error } = await db.from("push_subscriptions").delete().eq("endpoint", endpoint);
+      if (error) throw error;
+      return json({ success: true, message: "This device has been unsubscribed." });
+    }
+
     if (body.action === "send") {
       const authHeader = req.headers.get("Authorization") || "";
       const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
