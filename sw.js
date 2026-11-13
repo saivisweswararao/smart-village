@@ -3,7 +3,12 @@ self.addEventListener("push", event => {
   try { payload = event.data ? event.data.json() : {}; } catch (_) {}
   const title = payload.title || "Penubaka Village Update";
   const options = {
-    body: payload.body || "A new village announcement is available.",
+    body: payload.body || "A new village announcement is available. Tap to read more.",
+    icon: payload.icon || "/assets/Penubaka Village Pride Map.png",
+    badge: payload.badge || "/assets/Penubaka Village Pride Map.png",
+    image: payload.image || undefined,
+    timestamp: payload.timestamp || Date.now(),
+    vibrate: [120, 60, 120],
     data: { url: payload.url || "/announcements.html" },
     tag: payload.tag || "penubaka-village-update",
     renotify: false
