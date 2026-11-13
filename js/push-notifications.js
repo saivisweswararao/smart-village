@@ -62,6 +62,13 @@
     const id = visitorId();
     if (!id) throw new Error("Browser storage is unavailable. Please enable it and try again.");
 
+    // Ask for permission immediately from the user tap, before network calls.
+    let permission = null;
+    if ("Notification" in window) {
+      permission = Notification.permission;
+      if (permission === "default") permission = await Notification.requestPermission();
+    }
+
     const { error: interestError } = await window.supabaseClient.rpc("register_notification_interest", {
       p_village_slug: VILLAGE,
       p_visitor_id: id
@@ -69,12 +76,11 @@
     if (interestError) throw interestError;
     try { localStorage.setItem(INTEREST_KEY, "yes"); } catch (_) {}
 
-    let permission = Notification.permission;
-    if (permission === "default") permission = await Notification.requestPermission();
+    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+      throw new Error("Your interest was recorded, but this browser does not support web push. Try the latest Chrome browser on Android.");
+    }
     if (permission !== "granted") {
-      throw new Error(permission === "denied"
-        ? "Notifications are blocked for this website. Change this site's notification permission in your browser settings, then try again."
-        : "Notification permission was not granted. You can try again any time.");
+      throw new Error("Your interest was recorded, but notification permission was not granted. You can enable it in browser settings and try again.");
     }
 
     showStatus("Registering this device… / ఈ పరికరాన్ని నమోదు చేస్తున్నాము…");
