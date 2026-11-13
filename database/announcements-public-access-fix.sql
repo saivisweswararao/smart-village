@@ -3,6 +3,7 @@
 
 alter table public.announcements
   alter column title_te drop not null,
+  alter column body_te drop not null,
   add column if not exists photo_url text;
 
 -- Public image bucket for announcement photos (uploads remain admin-only).
