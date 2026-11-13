@@ -12,3 +12,14 @@
 .notification-interest-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
 .notification-interest-actions button:disabled{opacity:.65;cursor:default}
 .notification-interest .status-message{font-weight:600;color:#176b4d}
+
+
+/* Automatic in-page push notification invitation; existing section remains unchanged. */
+.push-notification-modal[hidden]{display:none}
+.push-notification-modal{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(13,28,20,.62)}
+.push-notification-modal-card{width:min(100%,430px);padding:28px 22px 22px;background:#fff;border-radius:20px;box-shadow:0 18px 60px rgba(0,0,0,.24);text-align:center}
+.push-modal-icon{font-size:38px;margin-bottom:8px}
+.push-notification-modal-card h2{margin:8px 0 10px;color:#183d2b}
+.push-notification-modal-card p{color:#52665a;line-height:1.6}
+.push-notification-modal-card button{width:100%;margin-top:10px}
+.push-notification-modal-card .push-modal-note{font-size:12px;margin:14px 0 0}
