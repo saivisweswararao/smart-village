@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Generate Web Push Keys</title><style>body{font:16px system-ui;max-width:760px;margin:30px auto;padding:0 18px;color:#183328}button{padding:12px 18px;background:#176b4d;color:white;border:0;border-radius:8px;font-weight:700}textarea{width:100%;min-height:74px;margin:8px 0 18px;padding:10px;box-sizing:border-box}p{line-height:1.6}.warning{color:#9b2c2c;font-weight:700}</style></head><body><h1>Generate Penubaka Web Push Keys</h1><p>Generate a VAPID key pair on this device. The private key is created locally in your browser and is not sent to any server by this page.</p><button id="generate">Generate new keys</button><p><b>Public key</b> (will be added to the website code)</p><textarea id="public" readonly></textarea><p><b>Private key</b> (keep secret; paste only into Supabase Edge Function Secrets)</p><textarea id="private" readonly></textarea><p class="warning">Never share the private key or commit it to GitHub. If you lose it after subscriptions are created, subscribers will need to subscribe again with a new key.</p><script>
+const toBase64Url = bytes => {
+  let binary = "";
+  for (const byte of new Uint8Array(bytes)) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+};
+document.getElementById("generate").addEventListener("click", async () => {
+  const pair = await crypto.subtle.generateKey({name:"ECDSA",namedCurve:"P-256"},true,["sign","verify"]);
+  const publicKey = await crypto.subtle.exportKey("raw",pair.publicKey);
+  const privateDer = new Uint8Array(await crypto.subtle.exportKey("pkcs8",pair.privateKey));
+  const privateKey = privateDer.slice(-32);
+  document.getElementById("public").value = toBase64Url(publicKey);
+  document.getElementById("private").value = toBase64Url(privateKey);
+});
+</script></body></html>
