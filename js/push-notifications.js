@@ -12,7 +12,7 @@
   const PUBLISHABLE_KEY = window.SUPABASE_PUBLISHABLE_KEY;
   // VAPID public key is intentionally public. Generate a matching private key and
   // store ONLY that private key as a Supabase Edge Function secret.
-  const VAPID_PUBLIC_KEY = "REPLACE_WITH_VAPID_PUBLIC_KEY";
+  const VAPID_PUBLIC_KEY = "BHCAPGj98jdQmoBZEweVM9jNaIccecDRuRN0DA4zl2qIkU3Za9N6UzwX9-2hnuSYnvB8fOT56Y7ikikmdtMTsKM";
 
   function visitorId() {
     try {
