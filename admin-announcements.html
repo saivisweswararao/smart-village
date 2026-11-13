@@ -11,23 +11,20 @@
 </head>
 <body>
 <header class="site-header"><a class="brand" href="admin.html"><span class="brand-icon">గ్రా</span><span><strong>Penubaka Admin</strong><small>Announcement management</small></span></a></header>
-<main class="page-wrap">
+<main class="page-wrap announcement-admin-page">
 <a class="nav-back" href="admin.html">← Back to admin</a>
-<h1>Manage village announcements</h1>
-<p class="muted">Create a bilingual announcement, publish it to the public website, and send a push notification to subscribed devices.</p>
+<div class="announcement-admin-hero"><span class="announcement-admin-kicker">📢 VILLAGE COMMUNICATION</span><h1>Manage announcements</h1><p>Create a clear village update. Add a photo if needed, then publish it to the portal and notify subscribed devices.</p></div>
 <section id="announcement-access-error" class="panel" hidden><p id="announcement-access-message" class="status-message"></p><a class="button" href="admin.html">Go to admin sign in</a></section>
 <section id="announcement-manager" hidden>
-<form id="announcement-form" class="panel">
-<h2>New announcement</h2>
-<div class="field"><label for="title-te">Title (Telugu)</label><input id="title-te" maxlength="180" required></div>
-<div class="field"><label for="title-en">Title (English)</label><input id="title-en" maxlength="180" required></div>
-<div class="field"><label for="body-te">Description (Telugu)</label><textarea id="body-te" rows="3" maxlength="3000"></textarea></div>
-<div class="field"><label for="body-en">Description (English)</label><textarea id="body-en" rows="3" maxlength="3000"></textarea></div>
-<div class="field"><label for="notification-page">Notification tap destination</label><select id="notification-page"><option value="/announcements.html" selected>Public announcements page</option><option value="/village-leaders.html">Village representatives page</option></select></div>
-<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="button button-secondary" type="button" id="save-draft">Save draft</button><button class="button" type="button" id="publish-announcement">Publish & send push notification</button></div>
+<form id="announcement-form" class="panel announcement-editor">
+<div class="announcement-section-heading"><span>✍️</span><div><h2>New announcement</h2><p>Title and description only. Photo is optional.</p></div></div>
+<div class="field"><label for="title">Title</label><input id="title" maxlength="180" placeholder="e.g. Village meeting on Sunday" required></div>
+<div class="field"><label for="description">Description</label><textarea id="description" rows="5" maxlength="3000" placeholder="Write the important details for villagers…" required></textarea></div>
+<div class="field"><label for="photo">Photo <span class="optional-label">Optional · JPG, PNG or WebP · max 5 MB</span></label><input id="photo" type="file" accept="image/jpeg,image/png,image/webp"><div id="photo-preview-wrap" class="announcement-photo-preview" hidden><img id="photo-preview" alt="Selected announcement photo preview"><button id="remove-photo" class="button button-secondary" type="button">Remove photo</button></div></div>
+<div class="announcement-publish-row"><button class="button button-secondary" type="button" id="save-draft">Save draft</button><button class="button" type="button" id="publish-announcement">🚀 Publish & notify</button></div>
 <p id="announcement-message" class="status-message" role="status" aria-live="polite"></p>
 </form>
-<section class="panel"><h2>Saved announcements</h2><p class="muted">Published announcements appear on the public Announcements page. Drafts are visible only to administrators.</p><div id="announcement-records" class="announcement-list"><p class="muted">Loading announcements…</p></div></section>
+<section class="panel announcement-records-panel"><div class="announcement-section-heading"><span>🗂️</span><div><h2>Saved announcements</h2><p>Published posts appear in the public portal. Drafts remain private.</p></div></div><div id="announcement-records" class="announcement-list"><p class="muted">Loading announcements…</p></div></section>
 </section>
 </main>
 <footer class="site-footer">Penubaka Smart Village · Admin portal</footer>
