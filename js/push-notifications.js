@@ -3,9 +3,6 @@
   const later = document.getElementById("notification-interest-later");
   const disableButton = document.getElementById("notification-interest-disable");
   const message = document.getElementById("notification-interest-message");
-  const popup = document.getElementById("push-notification-modal");
-  const popupEnable = document.getElementById("push-modal-enable");
-  const popupLater = document.getElementById("push-modal-later");
   if (!button || !later || !message) return;
 
   const VILLAGE = "penubaka";
@@ -107,12 +104,7 @@
     showStatus("Success! This device can now receive Penubaka announcements. / విజయవంతం! ఈ పరికరానికి పెనుబాక ప్రకటనలు వస్తాయి.");
   }
 
-  function closePopup() {
-    if (popup) popup.hidden = true;
-  }
-
   function startEnablePush() {
-    closePopup();
     button.disabled = true;
     later.disabled = true;
     showStatus("Please allow notifications when your browser asks. / బ్రౌజర్ అడిగినప్పుడు నోటిఫికేషన్లకు అనుమతి ఇవ్వండి.");
@@ -170,30 +162,7 @@
   syncExistingSubscription();
 
   button.addEventListener("click", startEnablePush);
-  popupEnable?.addEventListener("click", startEnablePush);
-  popupLater?.addEventListener("click", () => {
-    closePopup();
-    try { sessionStorage.setItem("penubaka_push_popup_dismissed", "yes"); } catch (_) {}
-  });
-
-  // Show an in-page invitation automatically on visits where this browser
-  // has not subscribed. The browser's native permission prompt still requires
-  // the visitor to tap the Enable button.
-  async function maybeShowPopup() {
-    if (!popup || !("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) return;
-    if (Notification.permission === "denied") return;
-    try {
-      const registration = await navigator.serviceWorker.getRegistration("/");
-      const subscription = registration && await registration.pushManager.getSubscription();
-      if (subscription || Notification.permission === "granted") return;
-      if (sessionStorage.getItem("penubaka_push_popup_dismissed") === "yes") return;
-      popup.hidden = false;
-    } catch (error) {
-      console.warn("Could not check push subscription before showing invitation:", error);
-      if (Notification.permission === "default") popup.hidden = false;
-    }
-  }
-  maybeShowPopup();
+  // Notifications are opt-in from the homepage button only; no automatic popup is shown.
 
   later.addEventListener("click", () => {
     document.querySelector(".notification-interest")?.setAttribute("hidden", "");
