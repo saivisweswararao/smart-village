@@ -27,3 +27,25 @@
 .announcement-title-en{font-size:1rem;font-weight:650;color:#52665a;margin:0 0 10px}
 .announcement-body-en{color:#52665a}
 .announcement-date{display:block;margin-top:12px}
+
+/* Announcement editor and public announcement presentation */
+.announcement-admin-page{max-width:900px}
+.announcement-admin-hero{padding:26px 24px;margin:12px 0 22px;border-radius:22px;background:linear-gradient(135deg,#123e2d,#247653);color:#fff;box-shadow:0 12px 28px rgba(20,75,49,.13)}
+.announcement-admin-hero h1{margin:8px 0;font-size:clamp(1.8rem,5vw,2.5rem)}
+.announcement-admin-hero p{max-width:650px;line-height:1.65;color:#e1f0e6;margin:0}
+.announcement-admin-kicker{font-size:.75rem;font-weight:800;letter-spacing:.1em;color:#c9e7d3}
+.announcement-editor,.announcement-records-panel{max-width:none;padding:clamp(18px,4vw,30px);border-radius:20px;box-shadow:0 8px 24px rgba(20,50,30,.045)}
+.announcement-section-heading{display:flex;gap:12px;align-items:flex-start;margin-bottom:22px}
+.announcement-section-heading>span{font-size:1.6rem}
+.announcement-section-heading h2{margin:0 0 4px}
+.announcement-section-heading p{margin:0;color:#68796e;line-height:1.5}
+.optional-label{display:block;font-size:.82rem;font-weight:400;color:#718076;margin-top:3px}
+.announcement-publish-row{display:flex;gap:10px;flex-wrap:wrap}
+.announcement-photo-preview{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-top:10px}
+.announcement-photo-preview img{width:min(100%,260px);max-height:190px;object-fit:cover;border-radius:14px;border:1px solid #dce7dd}
+.announcement-photo{display:block;width:100%;max-height:360px;object-fit:cover;border-radius:13px;margin-bottom:16px;background:#edf4ed}
+.announcement-title{font-size:1.25rem;color:#174b35}
+.announcement-body{white-space:pre-wrap;color:#43584a}
+.admin-announcement-card{display:grid;gap:8px}
+.admin-announcement-thumb{width:100%;max-height:180px;object-fit:cover;border-radius:12px}
+@media(max-width:520px){.announcement-publish-row .button{width:100%;text-align:center}.announcement-admin-hero{padding:22px 18px}}
