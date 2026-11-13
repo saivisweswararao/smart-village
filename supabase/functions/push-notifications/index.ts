@@ -106,7 +106,8 @@ Deno.serve(async (req: Request) => {
 
       const title = String(body.title || "").trim().slice(0, 100);
       const message = String(body.message || "").trim().slice(0, 240);
-      const targetUrl = typeof body.url === "string" && body.url.startsWith("/")
+      const allowedTargets = new Set(["/announcements.html","/village-leaders.html","/complaints.html","/development.html","/schemes.html","/services.html","/index.html"]);
+      const targetUrl = typeof body.url === "string" && allowedTargets.has(body.url)
         ? body.url : "/announcements.html";
       if (!title || !message) return json({ error: "Notification title and message are required" }, 400);
 
