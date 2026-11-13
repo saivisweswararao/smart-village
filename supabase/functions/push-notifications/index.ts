@@ -1,4 +1,4 @@
-import webpush from "npm:web-push@3.6.7";
+import * as webpush from "jsr:@negrel/webpush@0.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -20,11 +20,11 @@ Deno.serve(async (req: Request) => {
     const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const PUBLISHABLE_KEY = Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!;
     const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY")!;
-    const VAPID_PRIVATE_KEY = Deno.env.get("VAPID_PRIVATE_KEY")!;
+    const VAPID_KEY_PAIR_JSON = Deno.env.get("VAPID_KEY_PAIR_JSON")!;
     const VAPID_CONTACT_EMAIL = Deno.env.get("VAPID_CONTACT_EMAIL")!;
 
     if (!SUPABASE_URL || !SERVICE_ROLE_KEY || !PUBLISHABLE_KEY ||
-        !VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY || !VAPID_CONTACT_EMAIL) {
+        !VAPID_PUBLIC_KEY || !VAPID_KEY_PAIR_JSON || !VAPID_CONTACT_EMAIL) {
       return json({ error: "Push service is not configured. Contact the site administrator." }, 503);
     }
 
@@ -88,7 +88,8 @@ Deno.serve(async (req: Request) => {
         ? body.url : "/announcements.html";
       if (!title || !message) return json({ error: "Notification title and message are required" }, 400);
 
-      webpush.setVapidDetails("mailto:" + VAPID_CONTACT_EMAIL, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+      const vapidKeys = await webpush.importVapidKeys(JSON.parse(VAPID_KEY_PAIR_JSON), { extractable: false });
+      const appServer = await webpush.ApplicationServer.new({ contactInformation: "mailto:" + VAPID_CONTACT_EMAIL, vapidKeys });
       const { data: village, error: villageError } = await db
         .from("villages").select("id").eq("slug", "penubaka").single();
       if (villageError || !village) return json({ error: "Village not found" }, 404);
@@ -106,14 +107,14 @@ Deno.serve(async (req: Request) => {
 
       for (const item of subscriptions || []) {
         try {
-          await webpush.sendNotification(item.subscription, payload, { TTL: 3600, urgency: "normal" });
+          const subscriber = appServer.subscribe(item.subscription);
+          await subscriber.pushTextMessage(payload, { ttl: 3600 });
           sent++;
           await db.from("push_subscriptions").update({ last_success_at: new Date().toISOString() })
             .eq("endpoint", item.endpoint);
         } catch (error) {
           failed++;
-          const statusCode = (error as { statusCode?: number }).statusCode;
-          if (statusCode === 404 || statusCode === 410) {
+          if (error instanceof webpush.PushMessageError && error.isGone()) {
             await db.from("push_subscriptions").delete().eq("endpoint", item.endpoint);
             removed++;
           }
