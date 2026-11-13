@@ -14,33 +14,27 @@ document.addEventListener('DOMContentLoaded',async()=>{
   try{
     let data;
     if(page==='announcements.html'){
-      // SECURITY DEFINER RPC exposes only published announcements for the active village.
       const {data:rows,error}=await window.supabaseClient.rpc('get_public_announcements',{p_village_slug:'penubaka'});
-      if(error)throw new Error('Public announcements service is not installed or accessible. Run database/announcements-public-access-fix.sql in Supabase SQL Editor. Details: '+error.message);
+      if(error)throw new Error('Announcements could not be loaded: '+error.message);
       data=rows||[];
     }else{
-      const {data:village,error:villageError}=await window.supabaseClient.from('villages')
-        .select('id').eq('slug','penubaka').eq('is_active',true).maybeSingle();
+      const {data:village,error:villageError}=await window.supabaseClient.from('villages').select('id')
+        .eq('slug','penubaka').eq('is_active',true).maybeSingle();
       if(villageError)throw new Error('Could not verify Penubaka village: '+villageError.message);
-      if(!village)throw new Error('Penubaka village is missing or inactive. Please ask the administrator to check the villages table.');
+      if(!village)throw new Error('Penubaka village is missing or inactive.');
       const [table,field,value,sort]=conf;
-      let q=window.supabaseClient.from(table).select('*').eq('village_id',village.id)
-        .eq(field,value).order(sort,{ascending:false}).limit(100);
+      let q=window.supabaseClient.from(table).select('*').eq('village_id',village.id).eq(field,value).order(sort,{ascending:false}).limit(100);
       if(table==='service_listings')q=q.eq('owner_consent',true);
-      const {data:rows,error}=await q;
-      if(error)throw new Error('Database read failed: '+error.message);
-      data=rows||[];
+      const {data:rows,error}=await q;if(error)throw new Error('Database read failed: '+error.message);data=rows||[];
     }
-    if(!data.length){target.textContent='No published announcements yet.';return;}
+    if(!data.length){target.textContent=page==='announcements.html'?'No announcements have been published yet.':'No published items yet.';return;}
     target.replaceChildren(...data.map(row=>{
       const card=document.createElement('article');card.className='announcement-card';
       if(page==='announcements.html'){
-        const titleTe=document.createElement('h3');titleTe.className='announcement-title-te';titleTe.textContent=row.title_te||'';
-        const titleEn=document.createElement('h3');titleEn.className='announcement-title-en';titleEn.textContent=row.title_en||'';
-        if(titleTe.textContent)card.append(titleTe);if(titleEn.textContent)card.append(titleEn);
-        const bodyTe=document.createElement('p');bodyTe.className='announcement-body-te';bodyTe.textContent=row.body_te||'';
-        const bodyEn=document.createElement('p');bodyEn.className='announcement-body-en';bodyEn.textContent=row.body_en||'';
-        if(bodyTe.textContent)card.append(bodyTe);if(bodyEn.textContent)card.append(bodyEn);
+        if(row.photo_url){const img=document.createElement('img');img.className='announcement-photo';img.src=row.photo_url;img.alt=row.title_en||'Village announcement photo';img.loading='lazy';card.append(img);}
+        const title=document.createElement('h3');title.className='announcement-title';title.textContent=row.title_en||'Village announcement';
+        const body=document.createElement('p');body.className='announcement-body';body.textContent=row.body_en||'';
+        card.append(title,body);
         const dateValue=row.published_at||row.created_at;
         if(dateValue){const date=document.createElement('small');date.className='muted announcement-date';date.textContent=new Date(dateValue).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});card.append(date);}
       }else{
@@ -51,5 +45,5 @@ document.addEventListener('DOMContentLoaded',async()=>{
       }
       return card;
     }));
-  }catch(error){console.error('Could not load '+page+':',error);target.textContent=error.message||'Could not load published items. Please refresh or try again later.';}
+  }catch(error){console.error('Could not load '+page+':',error);target.textContent=error.message||'Could not load published items.';}
 });
