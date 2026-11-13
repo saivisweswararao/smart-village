@@ -126,8 +126,13 @@ Deno.serve(async (req: Request) => {
       if (listError) throw listError;
 
       let sent = 0, failed = 0, removed = 0;
+      const image = typeof body.image === "string" && body.image.startsWith("https://") ? body.image : undefined;
       const payload = JSON.stringify({
-        title, body: message, url: targetUrl, tag: "penubaka-announcement-" + Date.now()
+        title, body: message, url: targetUrl,
+        icon: "https://smart-village.viralam.workers.dev/assets/Penubaka%20Village%20Pride%20Map.png",
+        badge: "https://smart-village.viralam.workers.dev/assets/Penubaka%20Village%20Pride%20Map.png",
+        image, timestamp: Date.now(),
+        tag: "penubaka-announcement-" + Date.now()
       });
 
       for (const item of subscriptions || []) {
