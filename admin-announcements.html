@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="/js/legacy-host-redirect.js"></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manage announcements | Penubaka Admin</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script defer src="js/admin-announcements-page.js"></script>
+</head>
+<body>
+<header class="site-header"><a class="brand" href="admin.html"><span class="brand-icon">గ్రా</span><span><strong>Penubaka Admin</strong><small>Announcement management</small></span></a></header>
+<main class="page-wrap">
+<a class="nav-back" href="admin.html">← Back to admin</a>
+<h1>Manage village announcements</h1>
+<p class="muted">Create a bilingual announcement, publish it to the public website, and send a push notification to subscribed devices.</p>
+<section id="announcement-access-error" class="panel" hidden><p id="announcement-access-message" class="status-message"></p><a class="button" href="admin.html">Go to admin sign in</a></section>
+<section id="announcement-manager" hidden>
+<form id="announcement-form" class="panel">
+<h2>New announcement</h2>
+<div class="field"><label for="title-te">Title (Telugu)</label><input id="title-te" maxlength="180" required></div>
+<div class="field"><label for="title-en">Title (English)</label><input id="title-en" maxlength="180" required></div>
+<div class="field"><label for="body-te">Description (Telugu)</label><textarea id="body-te" rows="3" maxlength="3000"></textarea></div>
+<div class="field"><label for="body-en">Description (English)</label><textarea id="body-en" rows="3" maxlength="3000"></textarea></div>
+<div class="field"><label for="notification-page">Notification tap destination</label><select id="notification-page"><option value="/announcements.html" selected>Public announcements page</option><option value="/village-leaders.html">Village representatives page</option></select></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="button button-secondary" type="button" id="save-draft">Save draft</button><button class="button" type="button" id="publish-announcement">Publish & send push notification</button></div>
+<p id="announcement-message" class="status-message" role="status" aria-live="polite"></p>
+</form>
+<section class="panel"><h2>Saved announcements</h2><p class="muted">Published announcements appear on the public Announcements page. Drafts are visible only to administrators.</p><div id="announcement-records" class="announcement-list"><p class="muted">Loading announcements…</p></div></section>
+</section>
+</main>
+<footer class="site-footer">Penubaka Smart Village · Admin portal</footer>
+</body></html>
