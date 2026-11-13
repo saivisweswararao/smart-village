@@ -108,7 +108,7 @@ Deno.serve(async (req: Request) => {
       for (const item of subscriptions || []) {
         try {
           const subscriber = appServer.subscribe(item.subscription);
-          await subscriber.pushTextMessage(payload, { ttl: 3600 });
+          await subscriber.pushTextMessage(payload, { ttl: 3600, urgency: webpush.Urgency.High });
           sent++;
           await db.from("push_subscriptions").update({ last_success_at: new Date().toISOString() })
             .eq("endpoint", item.endpoint);
