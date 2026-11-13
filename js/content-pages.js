@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded',async()=>{
   const target=document.getElementById('content-list');
   if(!target)return;
-  if(!window.supabaseClient){target.textContent='Connect Supabase in js/config.js to load published information.';return;}
+  if(!window.supabaseClient){target.textContent='Supabase configuration is unavailable. Please check js/config.js.';return;}
   const page=location.pathname.split('/').pop();
   const map={
     'announcements.html':['announcements','status','published','created_at'],
@@ -12,20 +12,29 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const conf=map[page];
   if(!conf)return;
   try{
-    const {data:village,error:villageError}=await window.supabaseClient.from('villages')
-      .select('id').eq('slug','penubaka').eq('is_active',true).maybeSingle();
-    if(villageError)throw new Error('Could not verify Penubaka village: '+villageError.message);
-    if(!village)throw new Error('Penubaka village is missing or inactive. Please ask the administrator to check the villages table.');
-    const [table,field,value,sort]=conf;
-    let q=window.supabaseClient.from(table).select('*').eq('village_id',village.id)
-      .eq(field,value).order(sort,{ascending:false}).limit(100);
-    if(table==='service_listings')q=q.eq('owner_consent',true);
-    const {data,error}=await q;
-    if(error)throw new Error('Database read failed: '+error.message);
-    if(!data?.length){target.textContent='No published items yet.';return;}
+    let data;
+    if(page==='announcements.html'){
+      // SECURITY DEFINER RPC exposes only published announcements for the active village.
+      const {data:rows,error}=await window.supabaseClient.rpc('get_public_announcements',{p_village_slug:'penubaka'});
+      if(error)throw new Error('Public announcements service is not installed or accessible. Run database/announcements-public-access-fix.sql in Supabase SQL Editor. Details: '+error.message);
+      data=rows||[];
+    }else{
+      const {data:village,error:villageError}=await window.supabaseClient.from('villages')
+        .select('id').eq('slug','penubaka').eq('is_active',true).maybeSingle();
+      if(villageError)throw new Error('Could not verify Penubaka village: '+villageError.message);
+      if(!village)throw new Error('Penubaka village is missing or inactive. Please ask the administrator to check the villages table.');
+      const [table,field,value,sort]=conf;
+      let q=window.supabaseClient.from(table).select('*').eq('village_id',village.id)
+        .eq(field,value).order(sort,{ascending:false}).limit(100);
+      if(table==='service_listings')q=q.eq('owner_consent',true);
+      const {data:rows,error}=await q;
+      if(error)throw new Error('Database read failed: '+error.message);
+      data=rows||[];
+    }
+    if(!data.length){target.textContent='No published announcements yet.';return;}
     target.replaceChildren(...data.map(row=>{
       const card=document.createElement('article');card.className='announcement-card';
-      if(table==='announcements'){
+      if(page==='announcements.html'){
         const titleTe=document.createElement('h3');titleTe.className='announcement-title-te';titleTe.textContent=row.title_te||'';
         const titleEn=document.createElement('h3');titleEn.className='announcement-title-en';titleEn.textContent=row.title_en||'';
         if(titleTe.textContent)card.append(titleTe);if(titleEn.textContent)card.append(titleEn);
