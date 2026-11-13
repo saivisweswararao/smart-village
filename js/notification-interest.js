@@ -19,7 +19,8 @@
     }
   }
 
-  const saved = localStorage.getItem("penubaka_notification_interest_recorded");
+  let saved = null;
+  try { saved = localStorage.getItem("penubaka_notification_interest_recorded"); } catch (_) {}
   if (saved === "yes") {
     message.textContent = "Thank you! Your interest has already been recorded. / ధన్యవాదాలు! మీ ఆసక్తి ఇప్పటికే నమోదైంది.";
     yes.disabled = true;
@@ -45,7 +46,7 @@
         p_visitor_id: visitorId
       });
       if (error) throw error;
-      localStorage.setItem("penubaka_notification_interest_recorded", "yes");
+      try { localStorage.setItem("penubaka_notification_interest_recorded", "yes"); } catch (_) {}
       yes.textContent = "Interest recorded / ఆసక్తి నమోదైంది";
       message.textContent = "Thank you! Your interest has been recorded. This does not enable browser notifications yet. / ధన్యవాదాలు! మీ ఆసక్తి నమోదైంది. దీనివల్ల బ్రౌజర్ నోటిఫికేషన్లు ఇంకా ప్రారంభం కావు.";
       if (typeof data === "number") message.textContent += " Total interested: " + data.toLocaleString("en-IN");
