@@ -53,13 +53,6 @@
     if (!window.supabaseClient || !SUPABASE_URL || !PUBLISHABLE_KEY) {
       throw new Error("Website database configuration is unavailable. Please try again later.");
     }
-    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
-      throw new Error("This browser does not support web push notifications. Try the latest Chrome browser on Android.");
-    }
-    if (!VAPID_PUBLIC_KEY || VAPID_PUBLIC_KEY.startsWith("REPLACE_")) {
-      throw new Error("Push notifications are not fully configured yet. Please try again later.");
-    }
-
     const id = visitorId();
     if (!id) throw new Error("Browser storage is unavailable. Please enable it and try again.");
 
@@ -80,10 +73,12 @@
     if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
       throw new Error("Your interest was recorded, but this browser does not support web push. Try the latest Chrome browser on Android.");
     }
+    if (!VAPID_PUBLIC_KEY || VAPID_PUBLIC_KEY.startsWith("REPLACE_")) {
+      throw new Error("Your interest was recorded. Push notifications are still being configured; please try again later.");
+    }
     if (permission !== "granted") {
       throw new Error("Your interest was recorded, but notification permission was not granted. You can enable it in browser settings and try again.");
     }
-
     showStatus("Registering this device… / ఈ పరికరాన్ని నమోదు చేస్తున్నాము…");
     const registration = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
     await navigator.serviceWorker.ready;
