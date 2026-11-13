@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   if(!window.supabaseClient){target.textContent='Connect Supabase in js/config.js to load published information.';return;}
   const page=location.pathname.split('/').pop();
   const map={
-    'announcements.html':['announcements','status','published','published_at'],
+    'announcements.html':['announcements','status','published','created_at'],
     'schemes.html':['schemes','status','published','created_at'],
     'services.html':['service_listings','is_approved',true,'created_at'],
     'development.html':['public_works','is_published',true,'created_at']
@@ -13,14 +13,15 @@ document.addEventListener('DOMContentLoaded',async()=>{
   if(!conf)return;
   try{
     const {data:village,error:villageError}=await window.supabaseClient.from('villages')
-      .select('id').eq('slug','penubaka').eq('is_active',true).single();
-    if(villageError||!village)throw new Error('Penubaka village record was not found.');
+      .select('id').eq('slug','penubaka').eq('is_active',true).maybeSingle();
+    if(villageError)throw new Error('Could not verify Penubaka village: '+villageError.message);
+    if(!village)throw new Error('Penubaka village is missing or inactive. Please ask the administrator to check the villages table.');
     const [table,field,value,sort]=conf;
     let q=window.supabaseClient.from(table).select('*').eq('village_id',village.id)
       .eq(field,value).order(sort,{ascending:false}).limit(100);
     if(table==='service_listings')q=q.eq('owner_consent',true);
     const {data,error}=await q;
-    if(error)throw error;
+    if(error)throw new Error('Database read failed: '+error.message);
     if(!data?.length){target.textContent='No published items yet.';return;}
     target.replaceChildren(...data.map(row=>{
       const card=document.createElement('article');card.className='announcement-card';
@@ -41,5 +42,5 @@ document.addEventListener('DOMContentLoaded',async()=>{
       }
       return card;
     }));
-  }catch(error){console.error('Could not load '+page+':',error);target.textContent='Could not load published items. Please refresh or try again later.';}
+  }catch(error){console.error('Could not load '+page+':',error);target.textContent=error.message||'Could not load published items. Please refresh or try again later.';}
 });
