@@ -1,6 +1,7 @@
 (() => {
   const button = document.getElementById("notification-interest-yes");
   const later = document.getElementById("notification-interest-later");
+  const disableButton = document.getElementById("notification-interest-disable");
   const message = document.getElementById("notification-interest-message");
   if (!button || !later || !message) return;
 
@@ -104,8 +105,45 @@
     button.textContent = "Notifications enabled ✓ / నోటిఫికేషన్లు ప్రారంభమయ్యాయి";
     button.disabled = true;
     later.disabled = true;
+    if (disableButton) disableButton.hidden = false;
     showStatus("Success! This device can now receive Penubaka announcements. / విజయవంతం! ఈ పరికరానికి పెనుబాక ప్రకటనలు వస్తాయి.");
   }
+
+  async function syncExistingSubscription() {
+    if (!disableButton || !("serviceWorker" in navigator) || !("Notification" in window) || Notification.permission !== "granted") return;
+    try {
+      const registration = await navigator.serviceWorker.getRegistration("/");
+      const subscription = registration && await registration.pushManager.getSubscription();
+      if (subscription) {
+        button.disabled = true;
+        button.textContent = "Notifications enabled ✓ / నోటిఫికేషన్లు ప్రారంభమయ్యాయి";
+        disableButton.hidden = false;
+        showStatus("This device is subscribed to Penubaka updates. / ఈ పరికరం పెనుబాక అప్‌డేట్లకు నమోదు చేయబడింది.");
+      }
+    } catch (error) { console.warn("Could not check existing push subscription:", error); }
+  }
+
+  disableButton?.addEventListener("click", async () => {
+    disableButton.disabled = true;
+    try {
+      const registration = await navigator.serviceWorker.getRegistration("/");
+      const subscription = registration && await registration.pushManager.getSubscription();
+      if (subscription) {
+        const endpoint = subscription.endpoint;
+        await subscription.unsubscribe();
+        await callFunction({ action: "unsubscribe", endpoint });
+      }
+      disableButton.hidden = true;
+      disableButton.disabled = false;
+      button.disabled = false;
+      button.textContent = "Enable notifications / నోటిఫికేషన్లు ప్రారంభించండి";
+      later.disabled = false;
+      showStatus("Notifications turned off for this device. / ఈ పరికరంలో నోటిఫికేషన్లు ఆపివేయబడ్డాయి.");
+    } catch (error) {
+      disableButton.disabled = false;
+      showStatus("Could not turn off notifications: " + error.message);
+    }
+  });
 
   let alreadyInterested = false;
   try { alreadyInterested = localStorage.getItem(INTEREST_KEY) === "yes"; } catch (_) {}
@@ -113,6 +151,8 @@
     button.textContent = "Enable / Re-enable notifications";
     showStatus("Your interest is recorded. Tap to enable notifications on this device. / మీ ఆసక్తి నమోదైంది. ఈ పరికరంలో నోటిఫికేషన్ల కోసం నొక్కండి.");
   }
+
+  syncExistingSubscription();
 
   button.addEventListener("click", async () => {
     button.disabled = true;
