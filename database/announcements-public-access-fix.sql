@@ -1,10 +1,5 @@
 -- Fresh single-language Penubaka announcements with optional photos.
--- IMPORTANT: This intentionally deletes ALL existing Penubaka announcement rows
--- (draft, published and archived) so you can start with a clean announcement list.
--- Run once in Supabase Dashboard > SQL Editor.
-
-delete from public.announcements
-where village_id in (select id from public.villages where slug = 'penubaka');
+-- Run this setup script in Supabase Dashboard > SQL Editor.
 
 alter table public.announcements
   alter column title_te drop not null,
@@ -44,7 +39,9 @@ to authenticated
 using (bucket_id = 'announcement-photos' and (select private.is_admin()));
 
 -- Public feed: only published posts for the active village are returned.
-create or replace function public.get_public_announcements(p_village_slug text)
+-- Drop first because PostgreSQL cannot change a function's TABLE return shape with CREATE OR REPLACE.
+drop function if exists public.get_public_announcements(text);
+create function public.get_public_announcements(p_village_slug text)
 returns table (
   id uuid,
   title_en text,
