@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   return card;
  }
  async function refreshStatusCounts(){
-  const {data,error}=await client.rpc('admin_voter_record_status_counts');
+  const {data,error}=await client.rpc('admin_voter_record_status_counts_filtered',{p_query:$('q').value.trim()||null,p_ward:$('ward').value?Number($('ward').value):null});
   const host=$('status-counts');host.replaceChildren();
   if(error){host.textContent='Status counts unavailable. Run database/voter-status-management.sql in Supabase.';return;}
   const counts=Object.fromEntries((data||[]).map(x=>[x.voter_status,Number(x.voter_count)]));
@@ -67,10 +67,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if($('status-filter').value&&$('status-filter').value!==status)await load(true);
  });
  $('load-more').addEventListener('click',()=>load(false));
- $('search').addEventListener('click',()=>load(true));
- $('q').addEventListener('keydown',e=>{if(e.key==='Enter')load(true);});
- $('ward').addEventListener('change',()=>load(true));
- $('status-filter').addEventListener('change',()=>{refreshStatusCounts();load(true);});
+ $('search').addEventListener('click',()=>{refreshStatusCounts();load(true);});
+ $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){refreshStatusCounts();load(true);}});
+ $('ward').addEventListener('change',()=>{refreshStatusCounts();load(true);});
+ $('status-filter').addEventListener('change',()=>load(true));
  $('sign-out').addEventListener('click',async()=>{await client.auth.signOut();location.replace('admin.html');});
  await refreshStatusCounts();await load();
 });
