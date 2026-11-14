@@ -58,24 +58,31 @@ begin
   return true;
 end; $$;
 
-create or replace function public.admin_voter_record_status_counts()
+create or replace function public.admin_voter_record_status_counts_filtered(p_query text default null,p_ward integer default null)
 returns table(voter_status text,voter_count bigint)
 language plpgsql security definer set search_path = ''
-as $$
+as $
 begin
   if not (select private.is_admin()) then raise exception 'Not authorized'; end if;
+  if p_ward is not null and (p_ward < 1 or p_ward > 12) then raise exception 'Invalid ward'; end if;
   return query
     select s.status,count(v.id)::bigint
     from (values ('Verified'),('Not Verified'),('Equal'),('Not Required'),('Dead'),('Shifted outside'),('Duplicate')) as s(status)
-    left join private.voters v on v.village_slug='penubaka' and v.voter_status=s.status
+    left join private.voters v
+      on v.village_slug='penubaka'
+      and v.voter_status=s.status
+      and (p_ward is null or v.ward_no=p_ward)
+      and (nullif(trim(p_query),'') is null
+        or v.voter_name ilike '%' || trim(p_query) || '%'
+        or coalesce(v.voter_id,'') ilike '%' || trim(p_query) || '%')
     group by s.status
     order by case s.status when 'Verified' then 1 when 'Not Verified' then 2 when 'Equal' then 3
       when 'Not Required' then 4 when 'Dead' then 5 when 'Shifted outside' then 6 else 7 end;
-end; $$;
+end; $;
 
 revoke all on function public.admin_search_voters_by_status(text,integer,integer,integer,text) from public,anon;
 revoke all on function public.admin_update_voter_record_status(uuid,text) from public,anon;
-revoke all on function public.admin_voter_record_status_counts() from public,anon;
+revoke all on function public.admin_voter_record_status_counts_filtered(text,integer) from public,anon;
 grant execute on function public.admin_search_voters_by_status(text,integer,integer,integer,text) to authenticated;
 grant execute on function public.admin_update_voter_record_status(uuid,text) to authenticated;
-grant execute on function public.admin_voter_record_status_counts() to authenticated;
+grant execute on function public.admin_voter_record_status_counts_filtered(text,integer) to authenticated;
