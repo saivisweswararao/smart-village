@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   importButton.disabled=true;
   try{
    progress.textContent='Reading UTF-8 JSON and cleaning unsupported null characters…';
-   const rawText=new TextDecoder('utf-8',{fatal:true}).decode(await jsonFile.arrayBuffer()).replace(/^\\uFEFF/,'');
+   const rawText=new TextDecoder('utf-8',{fatal:true}).decode(await jsonFile.arrayBuffer()).replace(/^\uFEFF/,'');
    const records=JSON.parse(rawText);
    if(!Array.isArray(records)||records.length===0||records.length>5000)throw new Error('The JSON must contain a non-empty array of no more than 5,000 voter records.');
    let cleanedCharacters=0;
