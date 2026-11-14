@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="/js/legacy-host-redirect.js"></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Voter record status | Penubaka</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script defer src="js/admin-session.js"></script>
+<script defer src="js/voter-status-management.js"></script>
+<style>
+.status-toolbar{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end;margin:18px 0}
+.status-toolbar input,.status-toolbar select{width:100%;padding:12px;border:1px solid #cbd8ce;border-radius:10px;font:inherit}
+.status-counts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:12px 0}
+.status-count{border:1px solid #dce8df;background:#f8fbf8;border-radius:10px;padding:10px;text-align:left;color:#234235;font:inherit;cursor:pointer}
+.status-count strong{display:block;font-size:1.25rem;color:#176b4d}
+.status-count.active{border-color:#176b4d;background:#eaf5ed;box-shadow:inset 0 0 0 1px #176b4d}
+.voter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:16px}
+.voter-card{border:1px solid #dfe9e1;border-radius:16px;background:#fff;padding:16px;box-shadow:0 3px 12px rgba(20,60,35,.05)}
+.voter-photo{width:104px;height:124px;object-fit:cover;border-radius:10px;border:1px solid #dfe9e1;display:block;margin:0 0 10px}
+.voter-id{font-size:.84rem;font-weight:700;color:#315b43;margin:-2px 0 10px;overflow-wrap:anywhere}
+.voter-card h3{margin:0 0 8px;font-size:1.05rem;color:#174d38;overflow-wrap:anywhere}
+.voter-meta{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.voter-chip{background:#edf5ef;color:#24563d;border-radius:30px;padding:5px 9px;font-size:.78rem}
+.voter-details{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.voter-detail small{display:block;color:#68786e;font-size:.75rem;margin-bottom:3px}
+.voter-detail strong{font-size:.9rem;overflow-wrap:anywhere}
+.voter-status{margin:12px 0 0;padding:10px;border-radius:10px;background:#f6faf6;border:1px solid #e0e9e1}
+.voter-status small{display:block;color:#68786e;margin-bottom:7px}
+.status-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.status-button{border:1px solid #cbd8ce;background:#fff;color:#315b43;border-radius:8px;padding:8px 6px;font-size:.78rem;line-height:1.2;cursor:pointer;min-height:36px}
+.status-button.selected{background:#176b4d;border-color:#176b4d;color:#fff;font-weight:700}
+.status-button:disabled{opacity:.55;cursor:wait}
+.status-saving{font-size:.75rem;color:#68786e;margin-top:6px;min-height:1em}
+.empty-state{grid-column:1/-1;padding:24px;text-align:center;color:#66756b;border:1px dashed #cbd8ce;border-radius:14px}
+.notice{padding:13px 15px;background:#fff8e8;border:1px solid #eed9a5;border-radius:12px;line-height:1.55}
+@media(max-width:650px){.status-toolbar{grid-template-columns:1fr}.status-counts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header class="site-header"><a class="brand" href="index.html"><span class="brand-icon">గ్రా</span><span><strong>Penubaka Voter Records</strong><small>Private administrator area</small></span></a><button id="sign-out" class="button button-secondary" type="button">Sign out</button></header>
+<main class="page-wrap">
+<a class="nav-back" href="admin.html">← Admin</a>
+<h1>Voter record status</h1>
+<p class="muted">A separate page for maintaining voter-record verification and lifecycle details. This page does not modify the existing voter-management page or its import workflow.</p>
+<div class="notice">Private administrative record maintenance only. These statuses must not be used to infer or record anyone’s political preference. This is not an official Election Commission service.</div>
+<section class="panel" style="max-width:none;margin-top:18px">
+<h2>Record status summary</h2>
+<p class="muted">Tap a category to filter the voter records.</p>
+<div id="status-counts" class="status-counts" aria-live="polite">Loading counts…</div>
+</section>
+<section class="panel" style="max-width:none;margin-top:18px">
+<h2>Find and update records</h2>
+<div class="status-toolbar">
+<div class="field"><label for="q">Voter name or voter number</label><input id="q" type="search" maxlength="100" placeholder="Search voter records"></div>
+<div class="field"><label for="ward">Ward</label><select id="ward"><option value="">All wards</option><option value="1">Ward 1</option><option value="2">Ward 2</option><option value="3">Ward 3</option><option value="4">Ward 4</option><option value="5">Ward 5</option><option value="6">Ward 6</option><option value="7">Ward 7</option><option value="8">Ward 8</option><option value="9">Ward 9</option><option value="10">Ward 10</option><option value="11">Ward 11</option><option value="12">Ward 12</option></select></div>
+<div class="field"><label for="status-filter">Record status</label><select id="status-filter"><option value="">All statuses</option><option>Verified</option><option>Not Verified</option><option>Equal</option><option>Not Required</option><option>Dead</option><option>Shifted outside</option><option>Duplicate</option></select></div>
+<button id="search" class="button" type="button">Search</button>
+</div>
+<p id="message" class="status-message" role="status" aria-live="polite"></p>
+<div id="voter-cards" class="voter-grid" aria-live="polite"><div class="empty-state">Checking administrator access…</div></div>
+<div style="display:flex;justify-content:center;margin-top:16px"><button id="load-more" class="button button-secondary" type="button" hidden>Load more voters</button></div>
+<p class="muted" id="count"></p>
+</section>
+</main>
+<footer class="site-footer"><span>Private admin access · Penubaka</span><span>Record maintenance only.</span></footer>
+</body></html>
