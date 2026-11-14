@@ -63,8 +63,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   if(error){saving.textContent='Could not save: '+error.message;buttons.forEach(b=>b.disabled=false);return;}
   label.textContent='Record status · current: '+status;
   buttons.forEach(b=>{const active=b.dataset.status===status;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));b.disabled=false;});
-  saving.textContent='Saved';await refreshStatusCounts();
-  if($('status-filter').value&&$('status-filter').value!==status)await load(true);
+  saving.textContent='Saved';
+  await refreshStatusCounts();
+  const activeFilter=$('status-filter').value;
+  if(activeFilter&&activeFilter!==status){
+   card.remove();
+   currentOffset=Math.max(0,currentOffset-1);
+   const remaining=cards.querySelector('.voter-card');
+   if(!remaining)cards.innerHTML='<div class="empty-state">No voter records found for this status.</div>';
+   $('count').textContent=currentOffset?'Showing '+currentOffset+' voter records':'';
+   $('load-more').hidden=currentOffset===0;
+  }
  });
  $('load-more').addEventListener('click',()=>load(false));
  $('search').addEventListener('click',()=>{refreshStatusCounts();load(true);});
