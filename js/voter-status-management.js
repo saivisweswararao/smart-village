@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  async function refreshStatusCounts(){
   const {data,error}=await client.rpc('admin_voter_record_status_counts_filtered',{p_query:$('q').value.trim()||null,p_ward:$('ward').value?Number($('ward').value):null});
   const host=$('status-counts');host.replaceChildren();
-  if(error){host.textContent='Status counts unavailable. Run database/voter-status-management.sql in Supabase.';return;}
+  if(error){host.textContent='Status counts unavailable. Run database/voter-status-page.sql in Supabase.';return;}
   const counts=Object.fromEntries((data||[]).map(x=>[x.voter_status,Number(x.voter_count)]));
   const total=(data||[]).reduce((n,x)=>n+Number(x.voter_count),0);
   const all=document.createElement('button');all.type='button';all.className='status-count'+(!$('status-filter').value?' active':'');
