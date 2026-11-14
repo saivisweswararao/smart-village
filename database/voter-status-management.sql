@@ -1,6 +1,6 @@
--- Separate voter record-status feature for voter-status-management.html.
--- This migration intentionally does not replace or modify the existing
--- admin_search_voters function or the existing voter-management page.
+-- Penubaka voter record-maintenance statuses.
+-- Run once in Supabase SQL Editor after the page files are deployed.
+-- These labels describe record verification/lifecycle only; never use them to infer political views.
 
 alter table private.voters
   add column if not exists voter_status text not null default 'Not Verified';
@@ -12,7 +12,8 @@ alter table private.voters add constraint voters_voter_status_check
 create index if not exists private_voters_status_idx
   on private.voters(village_slug, voter_status, ward_no, serial_no);
 
-create or replace function public.admin_search_voters_by_status(
+drop function if exists public.admin_search_voters(text,integer,integer,integer);
+create function public.admin_search_voters(
   p_query text default null,
   p_ward integer default null,
   p_limit integer default 50,
@@ -47,7 +48,7 @@ begin
     offset greatest(coalesce(p_offset,0),0);
 end; $$;
 
-create or replace function public.admin_update_voter_record_status(p_voter_id uuid, p_status text)
+create or replace function public.admin_update_voter_status(p_voter_id uuid, p_status text)
 returns boolean
 language plpgsql security definer set search_path = ''
 as $$
@@ -63,7 +64,7 @@ begin
   return true;
 end; $$;
 
-create or replace function public.admin_voter_record_status_counts()
+create or replace function public.admin_voter_status_counts()
 returns table(voter_status text, voter_count bigint)
 language plpgsql security definer set search_path = ''
 as $$
@@ -84,9 +85,9 @@ begin
       when 'Shifted outside' then 6 else 7 end;
 end; $$;
 
-revoke all on function public.admin_search_voters_by_status(text,integer,integer,integer,text) from public, anon;
-revoke all on function public.admin_update_voter_record_status(uuid,text) from public, anon;
-revoke all on function public.admin_voter_record_status_counts() from public, anon;
-grant execute on function public.admin_search_voters_by_status(text,integer,integer,integer,text) to authenticated;
-grant execute on function public.admin_update_voter_record_status(uuid,text) to authenticated;
-grant execute on function public.admin_voter_record_status_counts() to authenticated;
+revoke all on function public.admin_search_voters(text,integer,integer,integer,text) from public, anon;
+revoke all on function public.admin_update_voter_status(uuid,text) from public, anon;
+revoke all on function public.admin_voter_status_counts() from public, anon;
+grant execute on function public.admin_search_voters(text,integer,integer,integer,text) to authenticated;
+grant execute on function public.admin_update_voter_status(uuid,text) to authenticated;
+grant execute on function public.admin_voter_status_counts() to authenticated;
