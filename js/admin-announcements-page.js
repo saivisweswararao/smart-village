@@ -126,7 +126,12 @@
       const { data, error } = await db.from("announcements").update({ status: "published", published_at: new Date().toISOString() })
         .eq("id", item.id).select("*").single();
       if (error) throw error;
-      try { const result = await sendPush(data); alert("Published! Notification sent to " + result.sent + " device(s)."); }
+      try {
+        const result = await sendPush(data);
+        alert(result.total === 0
+          ? "Published! No devices are registered for push notifications yet."
+          : "Published! " + result.sent + " notification(s) delivered; " + result.failed + " failed.");
+      }
       catch (pushError) { alert("Published on the website, but push delivery failed: " + pushError.message); }
       await loadAnnouncements();
     } catch (error) { alert("Could not publish: " + error.message); button.disabled = false; }
@@ -150,8 +155,11 @@
         status("Published. Sending village notification…");
         try {
           const result = await sendPush(item);
-          status("Published successfully · " + result.sent + " notification(s) sent" +
-            (result.failed ? " · " + result.failed + " failed" : "") + ".");
+          status(result.total === 0
+            ? "Published successfully. No devices are registered for push notifications yet."
+            : "Published successfully · " + result.sent + " notification(s) delivered" +
+              (result.failed ? " · " + result.failed + " failed" : "") +
+              (result.removed ? " · " + result.removed + " expired subscription(s) removed" : "") + ".");
         } catch (pushError) { status("Announcement is published, but push delivery failed: " + pushError.message); }
       }
       $("announcement-form").reset(); selectedPhoto = null; renderPhotoPreview(null);
