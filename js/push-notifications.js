@@ -15,7 +15,10 @@
   var INTEREST_KEY = "penubaka_notification_interest_recorded";
   var SUPABASE_URL = window.SUPABASE_URL;
   var PUBLISHABLE_KEY = window.SUPABASE_PUBLISHABLE_KEY;
-  var siteUrl = "https://smart-village.viralam.workers.dev";
+  var cachedVapidPublicKey = null;
+  var cachedRegistration = null;
+  var infrastructureReady = false;
+  var infrastructurePromise = null;
 
   function showStatus(text) { message.textContent = text; }
 
@@ -109,17 +112,47 @@
     });
   }
 
+  function preparePushInfrastructure() {
+    if (infrastructurePromise) return infrastructurePromise;
+    if (!hasPushSupport() || (isIOS() && !isInstalledWebApp())) {
+      infrastructurePromise = Promise.resolve(false);
+      return infrastructurePromise;
+    }
+    // Load the VAPID key and activate the service worker before the user taps
+    // Enable. This avoids network/installation work between the tap and subscribe().
+    infrastructurePromise = Promise.all([
+      callFunction({ action: "config" }),
+      navigator.serviceWorker.register("/sw.js", { scope: "/" })
+    ]).then(function (results) {
+      if (!results[0].vapidPublicKey) throw new Error("The push public key is not configured on the server.");
+      cachedVapidPublicKey = results[0].vapidPublicKey;
+      return navigator.serviceWorker.ready.then(function (registration) {
+        cachedRegistration = registration || results[1];
+        infrastructureReady = true;
+        return true;
+      });
+    }).catch(function (error) {
+      infrastructurePromise = null;
+      console.warn("Push preparation failed:", error);
+      return false;
+    });
+    return infrastructurePromise;
+  }
+
   function enablePush() {
     if (!SUPABASE_URL || !PUBLISHABLE_KEY) {
       return Promise.reject(new Error("Website notification configuration is unavailable. Please try again later."));
     }
     if (!hasPushSupport()) return Promise.reject(new Error(unsupportedMessage()));
     if (isIOS() && !isInstalledWebApp()) return Promise.reject(new Error(unsupportedMessage()));
+    if (!infrastructureReady || !cachedRegistration || !cachedVapidPublicKey) {
+      return Promise.reject(new Error("Please wait a few seconds for notification setup to finish, then tap Enable again. / నోటిఫికేషన్ సెటప్ పూర్తయ్యే వరకు కొన్ని క్షణాలు వేచి ఉండి మళ్లీ నొక్కండి."));
+    }
 
     var id;
     try { id = visitorId(); } catch (error) { return Promise.reject(error); }
 
-    // Permission is requested directly from the user's button tap.
+    // This permission request is made immediately in the user's tap handler.
     var permissionPromise = Notification.permission === "granted"
       ? Promise.resolve("granted")
       : Notification.permission === "denied"
@@ -131,29 +164,21 @@
         throw new Error("Notification permission was not granted. Enable it in this site's browser settings, then try again. / నోటిఫికేషన్ అనుమతి ఇవ్వలేదు. బ్రౌజర్ సెట్టింగ్స్‌లో అనుమతించి మళ్లీ ప్రయత్నించండి.");
       }
       showStatus("Registering this device… / ఈ పరికరాన్ని నమోదు చేస్తున్నాము…");
-      return callFunction({ action: "config" }).then(function (config) {
-        if (!config.vapidPublicKey) throw new Error("The push public key is not configured on the server.");
-        return navigator.serviceWorker.register("/sw.js", { scope: "/" }).then(function (registration) {
-          return navigator.serviceWorker.ready.then(function (readyRegistration) {
-            var activeRegistration = readyRegistration || registration;
-            return activeRegistration.pushManager.getSubscription().then(function (subscription) {
-              if (subscription) return subscription;
-              return activeRegistration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: base64UrlToBytes(config.vapidPublicKey)
-              });
-            }).then(function (subscription) {
-              return registerOnServer(id, subscription).then(function (result) {
-                if (!result.registered) throw new Error("The server did not confirm this device registration.");
-                try { localStorage.setItem(INTEREST_KEY, "yes"); } catch (_) {}
-                button.textContent = "Notifications enabled ✓ / నోటిఫికేషన్లు ప్రారంభమయ్యాయి";
-                button.disabled = true;
-                later.disabled = true;
-                if (disableButton) disableButton.hidden = false;
-                showStatus("Success! This device is registered and can receive Penubaka announcements. / విజయవంతం! ఈ పరికరం పెనుబాక ప్రకటనలకు నమోదు చేయబడింది.");
-              });
-            });
-          });
+      return cachedRegistration.pushManager.getSubscription().then(function (subscription) {
+        if (subscription) return subscription;
+        return cachedRegistration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: base64UrlToBytes(cachedVapidPublicKey)
+        });
+      }).then(function (subscription) {
+        return registerOnServer(id, subscription).then(function (result) {
+          if (!result.registered) throw new Error("The server did not confirm this device registration.");
+          try { localStorage.setItem(INTEREST_KEY, "yes"); } catch (_) {}
+          button.textContent = "Notifications enabled ✓ / నోటిఫికేషన్లు ప్రారంభమయ్యాయి";
+          button.disabled = true;
+          later.disabled = true;
+          if (disableButton) disableButton.hidden = false;
+          showStatus("Success! This device is registered and can receive Penubaka announcements. / విజయవంతం! ఈ పరికరం పెనుబాక ప్రకటనలకు నమోదు చేయబడింది.");
         });
       });
     });
@@ -231,5 +256,6 @@
     if (section) section.setAttribute("hidden", "");
   });
 
+  preparePushInfrastructure();
   syncExistingSubscription();
 })();
