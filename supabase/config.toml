@@ -1,2 +1,5 @@
 [functions.push-notifications]
 verify_jwt = false
+
+[functions.push-notifications-v2]
+verify_jwt = false
