@@ -92,7 +92,7 @@
   async function sendPush(item) {
     const { data: { session } } = await db.auth.getSession();
     if (!session?.access_token) throw new Error("Admin session expired. Please sign in again.");
-    const response = await fetch(window.SUPABASE_URL + "/functions/v1/push-notifications", {
+    const response = await fetch(window.SUPABASE_URL + "/functions/v1/push-notifications-v2", {
       method: "POST",
       headers: { "Content-Type": "application/json", "apikey": window.SUPABASE_PUBLISHABLE_KEY, "Authorization": "Bearer " + session.access_token },
       body: JSON.stringify({
