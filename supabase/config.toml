@@ -3,3 +3,6 @@ verify_jwt = false
 
 [functions.push-notifications-v2]
 verify_jwt = false
+
+[functions.push-notifications-v3]
+verify_jwt = false
