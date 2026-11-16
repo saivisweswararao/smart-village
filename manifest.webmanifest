@@ -1,0 +1,22 @@
+{
+  "id": "/",
+  "name": "Penubaka Smart Village",
+  "short_name": "Penubaka",
+  "description": "Penubaka village announcements, services and community updates.",
+  "lang": "te",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "theme_color": "#176b45",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/assets/Penubaka%20Village%20Pride%20Map.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
