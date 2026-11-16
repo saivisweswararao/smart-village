@@ -58,7 +58,7 @@
   }
 
   function callFunction(body, accessToken) {
-    return fetch(SUPABASE_URL + "/functions/v1/push-notifications", {
+    return fetch(SUPABASE_URL + "/functions/v1/push-notifications-v2", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
