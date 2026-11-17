@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="te"><head>
+<script src="/js/legacy-host-redirect.js"></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Request blood and view recent blood requests in Penubaka.">
+<title>Request Blood | Penubaka Smart Village</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script><script defer src="js/language.js"></script><script defer src="js/blood-requests.js"></script>
+<style>
+.request-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+.request-card{background:#fff;border:1px solid #e0e8e1;border-radius:14px;padding:15px;min-width:0}
+.request-card-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
+.request-group{font-size:1.25rem;font-weight:800;color:#a52a2a}
+.request-status{font-size:.78rem;font-weight:700;padding:5px 9px;border-radius:20px;background:#e8f5ed;color:#176b45}
+.request-status.expired{background:#f1f1f1;color:#666}
+.request-card p{margin:5px 0;overflow-wrap:anywhere}
+.request-meta{font-size:.85rem;color:#65766c;margin-top:10px}
+.request-empty{padding:18px;text-align:center;color:#65766c;background:#fff;border:1px dashed #cbd8ce;border-radius:12px}
+@media(max-width:650px){.request-list{grid-template-columns:1fr}}
+</style></head><body>
+<header class="site-header"><a class="brand" href="index.html"><span class="brand-icon">గ్రా</span><span><strong>మన పెనుబాక</strong><small>Penubaka Smart Village</small></span></a><button id="language-toggle" class="language-toggle" type="button">English</button></header>
+<main class="page-wrap">
+<a class="nav-back" href="index.html">← Home / హోమ్</a>
+<span class="eyebrow">COMMUNITY SUPPORT · సమాజ సహాయం</span>
+<h1 data-en="Request Blood" data-te="రక్తం కోసం అభ్యర్థించండి">రక్తం కోసం అభ్యర్థించండి</h1>
+<p class="muted" data-en="Submit an urgent blood requirement. The registered village administrator will receive a private alert. Requests remain open for 7 days." data-te="అత్యవసర రక్త అవసరాన్ని నమోదు చేయండి. నమోదు చేసిన గ్రామ నిర్వాహకుడికి ప్రైవేట్ నోటిఫికేషన్ వస్తుంది. అభ్యర్థన 7 రోజులు ఓపెన్‌లో ఉంటుంది.">అత్యవసర రక్త అవసరాన్ని నమోదు చేయండి. నమోదు చేసిన గ్రామ నిర్వాహకుడికి ప్రైవేట్ నోటిఫికేషన్ వస్తుంది. అభ్యర్థన 7 రోజులు ఓపెన్‌లో ఉంటుంది.</p>
+<section class="panel">
+<h2 data-en="Request details" data-te="అభ్యర్థన వివరాలు">అభ్యర్థన వివరాలు</h2>
+<form id="blood-request-form">
+<div class="field"><label for="request-name" data-en="Requester name" data-te="అభ్యర్థిస్తున్న వారి పేరు">అభ్యర్థిస్తున్న వారి పేరు</label><input id="request-name" name="name" autocomplete="name" maxlength="100" required minlength="2" placeholder="Full name / పూర్తి పేరు"></div>
+<div class="field"><label for="request-group" data-en="Required blood group" data-te="కావలసిన రక్త గ్రూప్">కావలసిన రక్త గ్రూప్</label><select id="request-group" required><option value="">Select blood group / రక్త గ్రూప్ ఎంచుకోండి</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
+<div class="field"><label for="request-mobile" data-en="Mobile number" data-te="మొబైల్ నంబర్">మొబైల్ నంబర్</label><input id="request-mobile" name="tel" type="tel" inputmode="numeric" autocomplete="tel" maxlength="10" pattern="[6-9][0-9]{9}" required placeholder="10-digit mobile number"></div>
+<label class="field" style="display:flex;gap:10px;align-items:flex-start"><input id="request-consent" type="checkbox" required style="width:auto;margin-top:4px"><span data-en="I agree that my name, required blood group and last 4 mobile digits will appear in public request history. My full mobile number will be sent only to the registered admin alert device." data-te="నా పేరు, కావలసిన రక్త గ్రూప్, మొబైల్ చివరి 4 అంకెలు పబ్లిక్ అభ్యర్థన చరిత్రలో కనిపించడానికి అంగీకరిస్తున్నాను. పూర్తి మొబైల్ నంబర్ నమోదు చేసిన నిర్వాహకుడి నోటిఫికేషన్ పరికరానికి మాత్రమే పంపబడుతుంది.">నా పేరు, కావలసిన రక్త గ్రూప్, మొబైల్ చివరి 4 అంకెలు పబ్లిక్ అభ్యర్థన చరిత్రలో కనిపించడానికి అంగీకరిస్తున్నాను. పూర్తి మొబైల్ నంబర్ నమోదు చేసిన నిర్వాహకుడి నోటిఫికేషన్ పరికరానికి మాత్రమే పంపబడుతుంది.</span></label>
+<button id="request-submit" class="button" type="submit" data-en="Submit blood request" data-te="రక్త అభ్యర్థన పంపండి">రక్త అభ్యర్థన పంపండి</button>
+<p id="request-message" class="status-message" role="status" aria-live="polite"></p>
+</form></section>
+<section class="panel" style="max-width:none;margin-top:24px">
+<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><h2 data-en="Blood request history" data-te="రక్త అభ్యర్థనల చరిత్ర">రక్త అభ్యర్థనల చరిత్ర</h2><p class="muted" data-en="Mobile numbers are masked for public privacy." data-te="వ్యక్తిగత గోప్యత కోసం మొబైల్ నంబర్లు దాచబడ్డాయి.">వ్యక్తిగత గోప్యత కోసం మొబైల్ నంబర్లు దాచబడ్డాయి.</p></div><button id="request-refresh" class="button button-secondary" type="button" data-en="Refresh" data-te="మళ్లీ చూడండి">మళ్లీ చూడండి</button></div>
+<p id="request-count" class="muted">Loading requests…</p>
+<div id="blood-request-history" class="request-list" aria-live="polite"><div class="request-empty">Loading…</div></div>
+</section></main>
+<footer class="site-footer"><span>© <span id="year"></span> Penubaka Smart Village</span><span>Community information · తెలుగు + English</span></footer>
+<script defer src="js/visitor-counter.js"></script></body></html>
