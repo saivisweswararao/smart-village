@@ -62,6 +62,18 @@ begin
     raise exception 'Public display consent is required.';
   end if;
 
+  -- Serialize registrations for the same mobile number so simultaneous
+  -- submissions cannot create duplicate donor records.
+  perform pg_advisory_xact_lock(hashtextextended(p_mobile_number, 0));
+
+  if exists (
+    select 1
+    from public.blood_donors d
+    where d.mobile_number = p_mobile_number
+  ) then
+    raise exception 'This mobile number is already registered. If you need to change the blood group or details, please contact the village administrator.';
+  end if;
+
   insert into public.blood_donors(full_name,mobile_number,blood_group,consent_public)
   values (trim(p_full_name),p_mobile_number,p_blood_group,true)
   returning id into v_id;
