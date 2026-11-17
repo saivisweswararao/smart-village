@@ -52,6 +52,61 @@ Deno.serve(async (req: Request) => {
       return json({ success: true, registered: true, message: "This device is now the private complaint-alert device." });
     }
 
+    if (action === "blood-request-created") {
+      const requestId = body.requestId;
+      if (!isUuid(requestId)) return json({ error: "Invalid blood request reference." }, 400);
+      const { data: request, error: requestError } = await db.from("blood_requests")
+        .select("id,full_name,mobile_number,blood_group,created_at")
+        .eq("id", requestId).maybeSingle();
+      if (requestError) throw requestError;
+      if (!request) return json({ error: "Blood request not found." }, 404);
+      const createdAt = new Date(request.created_at).getTime();
+      if (!Number.isFinite(createdAt) || Date.now() - createdAt > 10 * 60 * 1000 || createdAt > Date.now() + 60 * 1000)
+        return json({ error: "Blood request notification window expired." }, 400);
+
+      const { data: devices, error: deviceError } = await db.from("admin_complaint_push_subscriptions").select("endpoint,subscription");
+      if (deviceError) throw deviceError;
+      if (!devices?.length) return json({ success: true, sent: 0, message: "No private admin alert device is registered yet." });
+      const { error: logError } = await db.from("blood_request_push_delivery_log").insert({ blood_request_id: String(requestId) });
+      if (logError?.code === "23505") return json({ success: true, sent: 0, duplicate: true });
+      if (logError) throw logError;
+
+      const pair = Deno.env.get("VAPID_KEY_PAIR_JSON") || "";
+      const contact = Deno.env.get("VAPID_CONTACT_EMAIL") || "";
+      if (!vapidPublic || !pair || !contact) {
+        await db.from("blood_request_push_delivery_log").delete().eq("blood_request_id", String(requestId));
+        return json({ error: "Push sending is not fully configured." }, 503);
+      }
+      const keys = await webpush.importVapidKeys(JSON.parse(pair), { extractable: false });
+      if (await webpush.exportApplicationServerKey(keys) !== vapidPublic) {
+        await db.from("blood_request_push_delivery_log").delete().eq("blood_request_id", String(requestId));
+        return json({ error: "VAPID keys do not match." }, 503);
+      }
+      const server = await webpush.ApplicationServer.new({ contactInformation: "mailto:" + contact, vapidKeys: keys });
+      const payload = JSON.stringify({
+        title: "Penubaka: Blood request",
+        body: request.full_name + " (" + request.mobile_number + ") needs " + request.blood_group + " blood.",
+        url: "/blood-requests.html",
+        icon: "https://smart-village.viralam.workers.dev/assets/Penubaka%20Village%20Pride%20Map.png",
+        badge: "https://smart-village.viralam.workers.dev/assets/Penubaka%20Village%20Pride%20Map.png",
+        timestamp: Date.now(), tag: "penubaka-blood-request-" + requestId
+      });
+      let sent = 0;
+      for (const item of devices) {
+        try {
+          await server.subscribe(item.subscription).pushTextMessage(payload, { ttl: 3600, urgency: webpush.Urgency.High });
+          sent++;
+        } catch (pushError) {
+          console.error("Private blood request alert failed:", pushError);
+          if (pushError instanceof webpush.PushMessageError && pushError.isGone()) {
+            await db.from("admin_complaint_push_subscriptions").delete().eq("endpoint", item.endpoint);
+          }
+        }
+      }
+      if (!sent) await db.from("blood_request_push_delivery_log").delete().eq("blood_request_id", String(requestId));
+      return json({ success: true, sent, total: devices.length });
+    }
+
     if (action === "complaint-created") {
       const grievanceId = body.grievanceId;
       if (!isUuid(grievanceId)) return json({ error: "Invalid complaint reference." }, 400);
