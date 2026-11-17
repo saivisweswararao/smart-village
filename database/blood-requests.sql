@@ -9,8 +9,22 @@ create table if not exists public.blood_requests (
   blood_group text not null check (blood_group in ('A+','A-','B+','B-','AB+','AB-','O+','O-')),
   consent_public boolean not null default false check (consent_public = true),
   created_at timestamptz not null default now(),
-  expires_at timestamptz not null default (now() + interval '7 days')
+  expires_at timestamptz not null default (now() + interval '7 days'),
+  status text not null default 'Open' check (status in ('Open','Closed'))
 );
+
+-- Safe migration for databases created before the admin management screen.
+alter table public.blood_requests add column if not exists status text not null default 'Open';
+alter table public.blood_requests drop constraint if exists blood_requests_status_check;
+alter table public.blood_requests add constraint blood_requests_status_check check (status in ('Open','Closed'));
+
+grant select, update, delete on public.blood_requests to authenticated;
+drop policy if exists "Admins can view blood requests" on public.blood_requests;
+drop policy if exists "Admins can update blood requests" on public.blood_requests;
+drop policy if exists "Admins can delete blood requests" on public.blood_requests;
+create policy "Admins can view blood requests" on public.blood_requests for select to authenticated using ((select private.is_admin()));
+create policy "Admins can update blood requests" on public.blood_requests for update to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy "Admins can delete blood requests" on public.blood_requests for delete to authenticated using ((select private.is_admin()));
 
 create index if not exists blood_requests_created_idx
   on public.blood_requests (created_at desc);
@@ -75,7 +89,7 @@ set search_path = ''
 as $$
   select r.id, r.full_name, right(r.mobile_number,4), r.blood_group,
          r.created_at,
-         case when now() < r.expires_at then 'Open' else 'Expired' end
+         case when r.status = 'Closed' then 'Closed' when now() < r.expires_at then 'Open' else 'Expired' end
   from public.blood_requests r
   where r.consent_public = true
   order by r.created_at desc;
