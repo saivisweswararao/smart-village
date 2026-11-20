@@ -14,7 +14,11 @@ const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:
 const compact=n=>'₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:0});
 const el=id=>document.getElementById(id);
 el('pf-year').textContent=new Date().getFullYear();
-const latest=rows[rows.length-1],totalRejected=rows.reduce((s,r)=>s+r.rejected,0);\nconst totalReceived=rows.reduce((s,r)=>s+r.receipts,0),totalSpent=rows.reduce((s,r)=>s+r.adjusted,0),totalDifference=totalReceived-totalSpent;\nel('pf-total-received').textContent=compact(totalReceived);\nel('pf-total-spent').textContent=compact(totalSpent);\nel('pf-total-difference').textContent=(totalDifference>=0?'+':'−')+compact(Math.abs(totalDifference));
+const latest=rows[rows.length-1],totalRejected=rows.reduce((s,r)=>s+r.rejected,0);
+const totalReceived=rows.reduce((s,r)=>s+r.receipts,0),totalSpent=rows.reduce((s,r)=>s+r.adjusted,0),totalDifference=totalReceived-totalSpent;
+el('pf-total-received').textContent=compact(totalReceived);
+el('pf-total-spent').textContent=compact(totalSpent);
+el('pf-total-difference').textContent=(totalDifference>=0?'+':'−')+compact(Math.abs(totalDifference));
 el('pf-latest-balance').textContent=money(latest.closing);
 el('pf-latest-receipts').textContent=compact(latest.receipts);
 el('pf-latest-payments').textContent=compact(latest.adjusted);
