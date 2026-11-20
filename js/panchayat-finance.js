@@ -14,7 +14,7 @@ const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:
 const compact=n=>'₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:0});
 const el=id=>document.getElementById(id);
 el('pf-year').textContent=new Date().getFullYear();
-const latest=rows[rows.length-1],totalRejected=rows.reduce((s,r)=>s+r.rejected,0);
+const latest=rows[rows.length-1],totalRejected=rows.reduce((s,r)=>s+r.rejected,0);\nconst totalReceived=rows.reduce((s,r)=>s+r.receipts,0),totalSpent=rows.reduce((s,r)=>s+r.adjusted,0),totalDifference=totalReceived-totalSpent;\nel('pf-total-received').textContent=compact(totalReceived);\nel('pf-total-spent').textContent=compact(totalSpent);\nel('pf-total-difference').textContent=(totalDifference>=0?'+':'−')+compact(Math.abs(totalDifference));
 el('pf-latest-balance').textContent=money(latest.closing);
 el('pf-latest-receipts').textContent=compact(latest.receipts);
 el('pf-latest-payments').textContent=compact(latest.adjusted);
@@ -27,5 +27,5 @@ rows.filter(r=>r.rejected>0).forEach(r=>{const card=document.createElement('div'
 if(!adjustments.children.length)adjustments.textContent='No rejected-payment adjustments recorded.';
 if(window.Chart){const labels=rows.map(r=>r.year);new Chart(el('pf-receipts-chart'),{type:'bar',data:{labels,datasets:[{label:'Money received',data:rows.map(r=>r.receipts),backgroundColor:'#39845b'},{label:'Money spent',data:rows.map(r=>r.adjusted),backgroundColor:'#e0a044'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+money(c.raw)}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'₹'+Number(v).toLocaleString('en-IN')}}}}});
 new Chart(el('pf-balance-chart'),{type:'line',data:{labels,datasets:[{label:'Remaining balance',data:rows.map(r=>r.closing),borderColor:'#176b45',backgroundColor:'rgba(23,107,69,.12)',fill:true,tension:.25,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>money(c.raw)}}},scales:{y:{ticks:{callback:v=>'₹'+Number(v).toLocaleString('en-IN')}}}}});
-new Chart(el('pf-net-chart'),{type:'bar',data:{labels,datasets:[{label:'Money left over (+) / short (−)',data:rows.map(r=>r.receipts-r.adjusted),backgroundColor:rows.map(r=>r.receipts-r.adjusted>=0?'#39845b':'#d97757')}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>money(c.raw)}}},scales:{y:{ticks:{callback:v=>'₹'+Number(v).toLocaleString('en-IN')}}}}});}
+}
 })();
